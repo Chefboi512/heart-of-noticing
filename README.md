@@ -57,6 +57,45 @@ All images and GIFs are hosted on Cloudflare R2:
 - The "use client" directive at the top of `App.tsx` is harmless in a Vite SPA (it's a no-op string outside Next.js).
 - Designed mobile-first; optimized for touch interactions.
 
+## Deploying to Cloudflare Pages
+
+This project is pre-configured for Cloudflare Pages:
+
+- **`public/_redirects`** — SPA fallback so any unknown path serves `index.html` (state-based navigation works on refresh).
+- **`public/_headers`** — Cache & security headers:
+  - `Cache-Control: public, max-age=31536000, immutable` for `/assets/*` (hashed Vite bundles)
+  - `Cache-Control: public, max-age=0, must-revalidate` for `/*` (always-fresh HTML)
+  - `X-Content-Type-Options: nosniff`, `X-Frame-Options: SAMEORIGIN`, `Referrer-Policy: strict-origin-when-cross-origin`, `Permissions-Policy: camera=(), microphone=(), geolocation=()`
+
+### Quick deploy
+
+1. Push this repo to GitHub ✅ (already done)
+2. In Cloudflare dashboard → **Pages** → **Create a project** → **Connect to Git**
+3. Select the `Chefboi512/heart-of-noticing` repo
+4. Set the build settings:
+
+   | Field | Value |
+   |---|---|
+   | **Framework preset** | Vite |
+   | **Build command** | `pnpm build` |
+   | **Build output directory** | `dist` |
+   | **Root directory** | (leave blank) |
+   | **Node version** | 20 (or latest) |
+
+5. Click **Save and Deploy** — first build takes ~1–2 min
+
+### CLI deploy (alternative)
+
+```bash
+npm install -g wrangler
+pnpm build
+wrangler pages deploy dist --project-name=heart-of-noticing
+```
+
+### Why the static asset path
+
+Vite outputs hashed JS/CSS to `/assets/[name]-[hash].js`. The `_headers` rule sets `max-age=31536000, immutable` for that path because the hash changes whenever the content changes, so the browser can safely cache them forever. The HTML files are always revalidated.
+
 ## Author
 
 © 2026 Media Mack Designs. All Rights Reserved.
