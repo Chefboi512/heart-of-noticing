@@ -537,7 +537,7 @@ export default function App() {
           <motion.image
             href={IMG_URL}
             x="0" y="0" width="800" height="1100"
-            preserveAspectRatio="xMidYMid meet" crossOrigin="anonymous"
+            preserveAspectRatio="xMidYMid meet"
             initial={{ opacity: 0 }}
             animate={{ opacity: 0.9 }}
             transition={{ duration: 2.5, ease: bioEase }}
