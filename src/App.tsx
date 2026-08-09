@@ -1,7 +1,7 @@
 "use client"
 
 import React, { useState, useEffect, useRef } from "react"
-import { motion, AnimatePresence, useAnimation } from "framer-motion"
+import { motion, AnimatePresence } from "framer-motion"
 import { X, ArrowLeft, ArrowRight, Wind } from "lucide-react"
 
 // ── Theme Constants ──
@@ -250,9 +250,9 @@ function BodyExplorer() {
 }
 
 function HeaderBird() {
-  const controls = useAnimation()
   const [wingsOpen, setWingsOpen] = useState(true)
   const [direction, setDirection] = useState(1)
+  const [pos, setPos] = useState({ x: -100, y: 15, opacity: 0, duration: 0 })
 
   useEffect(() => {
     const interval = setInterval(() => setWingsOpen((prev) => !prev), 120)
@@ -260,51 +260,59 @@ function HeaderBird() {
   }, [])
 
   useEffect(() => {
-    let isMounted = true
+    let cancelled = false
+    const sleep = (ms) => new Promise((r) => setTimeout(r, ms))
     const fly = async () => {
-      // Initial wait before first flight
-      await new Promise((r) => setTimeout(r, 4000))
-
-      while (isMounted) {
-        // Fly Right to Left
+      await sleep(4000) // initial wait before first flight
+      while (!cancelled) {
+        // Right → Left
         setDirection(-1)
-        controls.set({ x: 900, y: 15, opacity: 1 })
-        await controls.start({ x: -100, y: [15, 35, 10, 25], transition: { duration: 12, ease: "linear" } })
-
-        if (!isMounted) break
-        // Crucial fix: Hide bird while waiting off-screen
-        controls.set({ opacity: 0 })
-        await new Promise((r) => setTimeout(r, 8000))
-
-        if (!isMounted) break
-
-        // Fly Left to Right
+        setPos({ x: 900, y: 15, opacity: 1, duration: 0 })
+        await sleep(40) // let DOM commit before starting transition
+        if (cancelled) break
+        setPos({ x: -100, y: 25, opacity: 1, duration: 12 })
+        await sleep(12000)
+        if (cancelled) break
+        // hide while waiting off-screen
+        setPos({ x: -100, y: 25, opacity: 0, duration: 0 })
+        await sleep(8000)
+        if (cancelled) break
+        // Left → Right
         setDirection(1)
-        controls.set({ x: -100, y: 25, opacity: 1 })
-        await controls.start({ x: 900, y: [25, 45, 15, 30], transition: { duration: 14, ease: "linear" } })
-
-        if (!isMounted) break
-        // Crucial fix: Hide bird while waiting off-screen
-        controls.set({ opacity: 0 })
-        await new Promise((r) => setTimeout(r, 12000))
+        setPos({ x: -100, y: 25, opacity: 1, duration: 0 })
+        await sleep(40)
+        if (cancelled) break
+        setPos({ x: 900, y: 30, opacity: 1, duration: 14 })
+        await sleep(14000)
+        if (cancelled) break
+        setPos({ x: 900, y: 30, opacity: 0, duration: 0 })
+        await sleep(12000)
       }
     }
     fly()
-    return () => { isMounted = false }
-  }, [controls])
+    return () => { cancelled = true }
+  }, [])
 
   return (
-    <motion.g animate={controls} initial={{ opacity: 0 }}>
-      <g transform={`scale(${direction}, 1)`}><image href={wingsOpen ? BIRD_OPEN : BIRD_CLOSED} x="-25" y="-25" width="50" height="50" /></g>
-    </motion.g>
+    <g
+      style={{
+        transform: `translate(${pos.x}px, ${pos.y}px)`,
+        opacity: pos.opacity,
+        transition: `transform ${pos.duration}s linear, opacity 0.6s ease`,
+      }}
+    >
+      <g transform={`scale(${direction}, 1)`}>
+        <image href={wingsOpen ? BIRD_OPEN : BIRD_CLOSED} x="-25" y="-25" width="50" height="50" />
+      </g>
+    </g>
   )
 }
 
 function HoleBird() {
-  const controls = useAnimation()
   const [wingsOpen, setWingsOpen] = useState(false)
   const [isFlying, setIsFlying] = useState(false)
   const [direction, setDirection] = useState(1)
+  const [pos, setPos] = useState({ x: -100, y: 500, opacity: 0, duration: 0 })
 
   useEffect(() => {
     if (!isFlying) { setWingsOpen(false); return }
@@ -313,30 +321,54 @@ function HoleBird() {
   }, [isFlying])
 
   useEffect(() => {
-    let isMounted = true
+    let cancelled = false
+    const sleep = (ms) => new Promise((r) => setTimeout(r, ms))
     const sequence = async () => {
-      await new Promise((r) => setTimeout(r, 6000))
-      while (isMounted) {
-        setIsFlying(true); setDirection(1); controls.set({ x: -100, y: 500, opacity: 1 })
-        await controls.start({ x: 400, y: 877, transition: { duration: 5, ease: "easeInOut" } })
-        if (!isMounted) break
-        setIsFlying(false); setDirection(-1)
-        await new Promise((r) => setTimeout(r, 12000))
-        if (!isMounted) break
-        setIsFlying(true); setDirection(1)
-        await controls.start({ x: 900, y: 300, transition: { duration: 5, ease: "easeInOut" } })
-        controls.set({ opacity: 0 })
-        await new Promise((r) => setTimeout(r, 22000))
+      await sleep(6000) // initial wait
+      while (!cancelled) {
+        // Fly into first hole
+        setIsFlying(true)
+        setDirection(1)
+        setPos({ x: -100, y: 500, opacity: 1, duration: 0 })
+        await sleep(40)
+        if (cancelled) break
+        setPos({ x: 400, y: 877, opacity: 1, duration: 5 }) // 5s glide
+        await sleep(5000)
+        if (cancelled) break
+        // Sit in hole
+        setIsFlying(false)
+        setDirection(-1)
+        await sleep(12000)
+        if (cancelled) break
+        // Fly out the other side
+        setIsFlying(true)
+        setDirection(1)
+        setPos({ x: 400, y: 877, opacity: 1, duration: 0 })
+        await sleep(40)
+        if (cancelled) break
+        setPos({ x: 900, y: 300, opacity: 1, duration: 5 })
+        await sleep(5000)
+        if (cancelled) break
+        setPos({ x: 900, y: 300, opacity: 0, duration: 0 })
+        await sleep(22000)
       }
     }
     sequence()
-    return () => { isMounted = false }
-  }, [controls])
+    return () => { cancelled = true }
+  }, [])
 
   return (
-    <motion.g animate={controls} initial={{ opacity: 0 }}>
-      <g transform={`scale(${direction}, 1)`}><image href={wingsOpen ? BIRD_OPEN : BIRD_CLOSED} x="-20" y="-20" width="40" height="40" /></g>
-    </motion.g>
+    <g
+      style={{
+        transform: `translate(${pos.x}px, ${pos.y}px)`,
+        opacity: pos.opacity,
+        transition: `transform ${pos.duration}s ease-in-out, opacity 0.6s ease`,
+      }}
+    >
+      <g transform={`scale(${direction}, 1)`}>
+        <image href={wingsOpen ? BIRD_OPEN : BIRD_CLOSED} x="-20" y="-20" width="40" height="40" />
+      </g>
+    </g>
   )
 }
 
