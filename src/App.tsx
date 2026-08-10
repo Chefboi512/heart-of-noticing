@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect, useRef } from "react"
 import { motion, AnimatePresence } from "framer-motion"
-import { X, ArrowLeft, ArrowRight, Wind } from "lucide-react"
+import { X, ArrowLeft, ArrowRight, CheckCircle2, Loader2, Wind } from "lucide-react"
 
 // ── Theme Constants ──
 const C = "#183624"
@@ -77,31 +77,36 @@ const NODES = [
     id: "guide", x: 400, y: 235,
     labelLines: [{ text: "The Guide", font: "serif" }, { text: "MEET EMILY", font: "sans" }],
     desc: "<strong>I'm not here to fix you. I'm here to breathe with you.</strong> I'm a recovered people-pleaser and overthinker who learned how to find quiet in the chaos. I hold a safe, welcoming space for kids, adults, and groups to just come as they are. No pressure, no perfection. Just breathing.",
-    cta: null
+    cta: null,
+    interestValue: "General Inquiry"
   },
   {
     id: "body", x: 680, y: 370,
     labelLines: [{ text: "Notice the Body", font: "serif" }, { text: "1-ON-1 SESSIONS", font: "sans" }],
     desc: "<strong>Sometimes, we just need a quiet space to ourselves.</strong> In our one-on-one sessions, we move at your exact pace. We'll use gentle breathwork to help you release tension, calm your mind, and feel at home in your own skin again.",
-    cta: { text: "Book a Discovery Call", type: "button", href: "#" }
+    cta: "Book a Discovery Call",
+    interestValue: "1-on-1 Sessions"
   },
   {
     id: "earth", x: 540, y: 815,
     labelLines: [{ text: "Notice the Earth", font: "serif" }, { text: "NATURE GROUPS", font: "sans" }],
     desc: "<strong>There is a deep peace in breathing outside together.</strong> Join me for small, guided group sessions in the fresh air of Lancaster County. We'll step away from the screens, get our feet on the ground, and learn how to borrow the calm, slow rhythm of the natural world.",
-    cta: { text: "Reserve Your Spot", type: "button", href: "#" }
+    cta: "Reserve Your Spot",
+    interestValue: "Nature Groups"
   },
   {
     id: "room", x: 260, y: 815,
     labelLines: [{ text: "Notice the Room", font: "serif" }, { text: "SCHOOLS & FACILITIES", font: "sans" }],
     desc: "<strong>Calm can be brought into any room.</strong> I partner with schools, recovery centers, and organizations to share simple, powerful breathing tools. Whether it's helping students focus or offering a moment of peace in a rehab setting, we make breathwork accessible and safe for everyone.",
-    cta: { text: "Schedule a Consult", type: "button", href: "#" }
+    cta: "Schedule a Consult",
+    interestValue: "Schools & Facilities"
   },
   {
     id: "circle", x: 120, y: 370,
     labelLines: [{ text: "Stay Close", font: "serif" }, { text: "THE CIRCLE", font: "sans" }],
     desc: "<strong>Not ready to jump in? That's perfectly okay.</strong> Join 'The Circle', my personal check-in list. It’s just real, gentle emails from me (never automated) sharing little reminders to breathe and notice the good things around you.",
-    cta: { text: "Join", type: "input" }
+    cta: "Join The Circle",
+    interestValue: "The Circle (Newsletter)"
   },
 ]
 
@@ -144,7 +149,7 @@ const BODY_STEPS = [
 ]
 
 // ── Redesigned Body Explorer ──
-function BodyExplorer() {
+function BodyExplorer({ onOpenForm }) {
   const [stepIdx, setStepIdx] = useState(0)
   const step = BODY_STEPS[stepIdx]
 
@@ -263,28 +268,30 @@ function HeaderBird() {
     let cancelled = false
     const sleep = (ms) => new Promise((r) => setTimeout(r, ms))
     const fly = async () => {
-      await sleep(4000) // initial wait before first flight
+      await sleep(4000)
       while (!cancelled) {
-        // Right → Left
         setDirection(-1)
         setPos({ x: 900, y: 15, opacity: 1, duration: 0 })
-        await sleep(40) // let DOM commit before starting transition
+        await sleep(40)
         if (cancelled) break
+
         setPos({ x: -100, y: 25, opacity: 1, duration: 12 })
         await sleep(12000)
         if (cancelled) break
-        // hide while waiting off-screen
+
         setPos({ x: -100, y: 25, opacity: 0, duration: 0 })
         await sleep(8000)
         if (cancelled) break
-        // Left → Right
+
         setDirection(1)
         setPos({ x: -100, y: 25, opacity: 1, duration: 0 })
         await sleep(40)
         if (cancelled) break
+
         setPos({ x: 900, y: 30, opacity: 1, duration: 14 })
         await sleep(14000)
         if (cancelled) break
+
         setPos({ x: 900, y: 30, opacity: 0, duration: 0 })
         await sleep(12000)
       }
@@ -324,31 +331,33 @@ function HoleBird() {
     let cancelled = false
     const sleep = (ms) => new Promise((r) => setTimeout(r, ms))
     const sequence = async () => {
-      await sleep(6000) // initial wait
+      await sleep(6000)
       while (!cancelled) {
-        // Fly into first hole
         setIsFlying(true)
         setDirection(1)
         setPos({ x: -100, y: 500, opacity: 1, duration: 0 })
         await sleep(40)
         if (cancelled) break
-        setPos({ x: 400, y: 877, opacity: 1, duration: 5 }) // 5s glide
+
+        setPos({ x: 400, y: 877, opacity: 1, duration: 5 })
         await sleep(5000)
         if (cancelled) break
-        // Sit in hole
+
         setIsFlying(false)
         setDirection(-1)
         await sleep(12000)
         if (cancelled) break
-        // Fly out the other side
+
         setIsFlying(true)
         setDirection(1)
         setPos({ x: 400, y: 877, opacity: 1, duration: 0 })
         await sleep(40)
         if (cancelled) break
+
         setPos({ x: 900, y: 300, opacity: 1, duration: 5 })
         await sleep(5000)
         if (cancelled) break
+
         setPos({ x: 900, y: 300, opacity: 0, duration: 0 })
         await sleep(22000)
       }
@@ -376,7 +385,6 @@ function AcornNode({ size, active }) {
   const col = active ? "#2a6040" : C
   return (
     <svg x={-size} y={-size} width={size * 2} height={size * 2} viewBox="-50 -50 100 100" style={{ overflow: "visible", pointerEvents: "none" }}>
-      {/* Thicker, dynamic ring for visual pop */}
       {active && <circle cx="0" cy="0" r="58" fill="none" stroke={col} strokeWidth="4" opacity="0.5" />}
       <image href={ACORN_URL} x="-50" y="-50" width="100" height="100" transform="rotate(14)" />
     </svg>
@@ -384,10 +392,13 @@ function AcornNode({ size, active }) {
 }
 
 export default function App() {
-  const [isLoaded, setIsLoaded] = useState(true) // Set to true to bypass loader
   const [activeId, setActiveId] = useState(null)
   const [hoverId, setHoverId] = useState(null)
+
+  // Form & Booking State
   const [showBookingMenu, setShowBookingMenu] = useState(false)
+  const [selectedInterest, setSelectedInterest] = useState("General Inquiry")
+  const [formStatus, setFormStatus] = useState("idle") // 'idle' | 'submitting' | 'success'
 
   const [canScroll, setCanScroll] = useState(false)
   const scrollRef = useRef(null)
@@ -424,7 +435,7 @@ export default function App() {
   }
 
   useEffect(() => {
-    if (activeNode) {
+    if (activeNode || showBookingMenu) {
       const timeoutId = setTimeout(checkScroll, 100);
       window.addEventListener("resize", checkScroll);
       return () => {
@@ -434,46 +445,60 @@ export default function App() {
     } else {
       setCanScroll(false)
     }
-  }, [activeNode, activeGifSrc]);
+  }, [activeNode, activeGifSrc, showBookingMenu]);
 
   const handleNodeInteraction = (id) => {
     triggerHaptic([25])
     setActiveId(activeId === id ? null : id)
   }
 
+  const handleOpenForm = (interestValue = "General Inquiry") => {
+    triggerHaptic([30, 20]);
+    setSelectedInterest(interestValue);
+    setFormStatus("idle");
+    setActiveId(null); // Close editorial modal if open
+    setShowBookingMenu(true);
+  }
+
+  const handleFormSubmit = async (e) => {
+    e.preventDefault();
+    triggerHaptic([15]);
+    setFormStatus("submitting");
+
+    const form = e.target;
+    const formData = new FormData(form);
+
+    try {
+      const response = await fetch(form.action, {
+        method: "POST",
+        headers: { "Accept": "application/json" },
+        body: formData,
+      });
+
+      if (response.ok) {
+        triggerHaptic([40, 20, 40]);
+        setFormStatus("success");
+      } else {
+        setFormStatus("idle");
+        alert("Something went wrong. Please try again.");
+      }
+    } catch (error) {
+      setFormStatus("idle");
+      alert("Network error. Please try again.");
+    }
+  }
+
   return (
-    <main className="relative w-full h-[100dvh] overflow-hidden overscroll-none bg-[#EAE5D4]">
+    <main className="relative w-full h-screen overflow-hidden bg-[#EAE5D4]">
       <style
         dangerouslySetInnerHTML={{
           __html: `
         @import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;1,400;1,500&family=Dancing+Script:wght@600&family=Montserrat:wght@400;500;600;700&display=swap');
 
-        /* ── Full-screen lock: prevent overscroll, pull-to-refresh, bounce ── */
-        html, body {
-          margin: 0;
-          padding: 0;
-          width: 100%;
-          height: 100%;
-          overflow: hidden;
-          overscroll-behavior: none;
-          -webkit-overflow-scrolling: auto;
-          position: fixed;
-          inset: 0;
-          -webkit-tap-highlight-color: transparent;
-          -webkit-touch-callout: none;
-        }
-        #root {
-          width: 100%;
-          height: 100%;
-          overflow: hidden;
-          overscroll-behavior: none;
-        }
-
         strong { font-weight: 600; color: ${C}; opacity: 1; }
         a { color: ${AMBER}; text-decoration: none; border-bottom: 1px dotted rgba(201, 138, 60, 0.5); transition: all 0.3s ease; }
         a:hover { border-bottom: 1px solid ${AMBER}; opacity: 0.9; }
 
-        .editorial-scroll { overscroll-behavior: contain; }
         .editorial-scroll::-webkit-scrollbar { width: 4px; }
         .editorial-scroll::-webkit-scrollbar-track { background: transparent; }
         .editorial-scroll::-webkit-scrollbar-thumb { background: rgba(24, 54, 36, 0.2); border-radius: 10px; }
@@ -485,11 +510,39 @@ export default function App() {
           border: 1px solid rgba(255, 255, 255, 0.4);
           box-shadow: 0 30px 60px -12px rgba(24, 54, 36, 0.25), inset 0 0 0 1px rgba(255, 255, 255, 0.3);
         }
+
+        .form-input {
+          width: 100%;
+          background: rgba(24, 54, 36, 0.04);
+          border: 1px solid rgba(24, 54, 36, 0.1);
+          border-radius: 16px;
+          padding: 16px 20px;
+          color: ${C};
+          font-family: 'Montserrat', sans-serif;
+          font-size: 14px;
+          outline: none;
+          transition: all 0.3s ease;
+        }
+        .form-input:focus {
+          border-color: ${AMBER};
+          background: rgba(255, 255, 255, 0.5);
+          box-shadow: 0 0 0 4px rgba(201, 138, 60, 0.1);
+        }
+        .form-input::placeholder { color: rgba(24, 54, 36, 0.4); }
+
+        select.form-input {
+          appearance: none;
+          background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23183624' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e");
+          background-repeat: no-repeat;
+          background-position: right 1rem center;
+          background-size: 1em;
+          padding-right: 40px;
+        }
       `,
         }}
       />
 
-      {/* ── Ambient Breathing Halo (Adaptive Cognitive Resonance) ── */}
+      {/* ── Ambient Breathing Halo ── */}
       <motion.div
         className="absolute inset-0 pointer-events-none opacity-40 mix-blend-multiply"
         animate={{
@@ -499,7 +552,7 @@ export default function App() {
             `radial-gradient(circle at 50% 40%, rgba(201,138,60,0.1) 0%, rgba(234,229,212,0) 60%)`
           ]
         }}
-        transition={{ duration: 11, repeat: Infinity, ease: "easeInOut" }} // 4s inhale, 7s hold/exhale approx
+        transition={{ duration: 11, repeat: Infinity, ease: "easeInOut" }}
       />
 
       {/* ── Main Fluid SVG Container ── */}
@@ -529,7 +582,7 @@ export default function App() {
               </g>
             </mask>
             <clipPath id="header-reveal">
-              <motion.rect x="0" y="0" width="800" height="300" initial={{ width: 0 }} animate={{ width: isLoaded ? 800 : 0 }} transition={{ duration: 2.8, ease: slowBioEase, delay: 0.2 }} />
+              <motion.rect x="0" y="0" width="800" height="300" initial={{ width: 0 }} animate={{ width: 800 }} transition={{ duration: 2.8, ease: slowBioEase, delay: 0.2 }} />
             </clipPath>
           </defs>
 
@@ -537,7 +590,7 @@ export default function App() {
           <motion.image
             href={IMG_URL}
             x="0" y="0" width="800" height="1100"
-            preserveAspectRatio="xMidYMid meet"
+            preserveAspectRatio="xMidYMid meet" crossOrigin="anonymous"
             initial={{ opacity: 0 }}
             animate={{ opacity: 0.9 }}
             transition={{ duration: 2.5, ease: bioEase }}
@@ -580,10 +633,7 @@ export default function App() {
             {NODES.map((node, i) => {
               const isLit = hoverId === node.id || activeId === node.id
               return (
-                // STATIC Transform wrapper so Framer Motion doesn't overwrite X/Y coordinates
                 <g key={node.id} transform={`translate(${node.x},${node.y})`}>
-
-                  {/* INTERACTIVE animation wrapper for scale & rotation */}
                   <motion.g
                     onClick={(e) => { e.stopPropagation(); handleNodeInteraction(node.id); }}
                     onMouseEnter={() => setHoverId(node.id)}
@@ -592,18 +642,13 @@ export default function App() {
                     whileHover={{ scale: 1.05, transition: squishSpring }}
                     style={{ cursor: "pointer", touchAction: "manipulation" }}
                   >
-                    {/* Invisible Hitbox */}
                     <circle r={110} fill="transparent" pointerEvents="all" />
-
-                    {/* Active Pop Animation (scales up when clicked/hovered) */}
                     <motion.g
                       animate={isLit ? { rotate: 0, scale: 1.1 } : { rotate: [0, -3, 2, -1, 0], scale: 1 }}
                       transition={isLit ? { duration: 0.4, ease: bioEase } : { duration: 1.5, repeat: Infinity, repeatDelay: 6 + (i * 2), delay: 2 + (i * 1.5), ease: "easeInOut" }}
                     >
                       <AcornNode size={85} active={isLit} />
                     </motion.g>
-
-                    {/* Text Pop Animation */}
                     <motion.text
                       x={0} y={0} textAnchor="middle" fill={C}
                       animate={{ opacity: isLit ? 1 : 0.75, scale: isLit ? 1.05 : 1 }}
@@ -637,7 +682,7 @@ export default function App() {
         )}
       </AnimatePresence>
 
-      {/* ── Floating Booking CTA Modal (Glassmorphism) ── */}
+      {/* ── Floating Comprehensive Form Modal (Glassmorphism) ── */}
       <AnimatePresence>
         {showBookingMenu && (
           <motion.div
@@ -645,47 +690,108 @@ export default function App() {
             animate={{ x: "-50%", y: "-50%", scale: 1, opacity: 1, filter: "blur(0px)" }}
             exit={{ x: "-50%", y: "-45%", scale: 0.95, opacity: 0, filter: "blur(4px)" }}
             transition={{ duration: 0.5, ease: slowBioEase }}
-            className="fixed z-50 flex flex-col items-center top-1/2 left-1/2 w-[90%] max-w-[420px] glass-panel rounded-[32px] p-8 md:p-10"
+            className="fixed z-50 flex flex-col top-1/2 left-1/2 w-[92%] max-w-[500px] max-h-[85vh] glass-panel rounded-[32px] overflow-hidden"
           >
             <motion.button
               whileHover={{ scale: 1.1, rotate: 90, backgroundColor: "rgba(201,138,60,0.1)" }}
-              whileTap={{ scale: 0.8, opacity: 0.5, transition: squishSpring }}
+              whileTap={{ scale: 0.8, transition: squishSpring }}
               onClick={(e) => { e.stopPropagation(); triggerHaptic([15]); setShowBookingMenu(false); }}
-              className="absolute top-5 right-5 text-[#183624] opacity-50 hover:opacity-100 transition-all rounded-full p-2"
+              className="absolute top-5 right-5 text-[#183624] opacity-50 hover:opacity-100 transition-all rounded-full p-2 z-20"
               style={{ touchAction: "manipulation" }}
             >
               <X size={22} />
             </motion.button>
 
-            <p className="font-['Montserrat'] text-[11px] tracking-[0.25em] font-semibold mb-2" style={{ color: AMBER }}>BEGIN NOTICING</p>
-            <h2 className="font-['Dancing_Script'] text-[44px] leading-[1.05] mb-8" style={{ color: C }}>Work with Emily</h2>
+            <div ref={scrollRef} onScroll={checkScroll} className="editorial-scroll w-full h-full overflow-y-auto px-8 py-10 md:px-10 md:py-12">
+              <div className="flex flex-col items-center text-center">
+                <p className="font-['Montserrat'] text-[11px] tracking-[0.25em] font-semibold mb-2" style={{ color: AMBER }}>TAKE A BREATH</p>
+                <h2 className="font-['Dancing_Script'] text-[44px] leading-[1.05] mb-8" style={{ color: C }}>Connect with Emily</h2>
+              </div>
 
-            <div className="flex flex-col gap-4 w-full">
-              {[
-                { title: "Notice the Body", sub: "1-on-1 Sessions" },
-                { title: "Notice the Earth", sub: "Nature Groups" },
-                { title: "Notice the Room", sub: "Schools & Facilities" }
-              ].map((item, i) => (
-                <motion.button
-                  key={i}
-                  whileHover={{ scale: 1.02 }}
-                  whileTap={{ scale: 0.95, filter: "brightness(0.9)", transition: squishSpring }}
-                  onClick={(e) => { e.stopPropagation(); triggerHaptic([20]); }}
-                  className="w-full py-4 px-6 rounded-2xl border border-[#183624]/15 hover:border-[#C98A3C]/50 hover:bg-[#C98A3C]/5 transition-all text-left flex flex-col group relative overflow-hidden bg-white/30"
-                  style={{ touchAction: "manipulation" }}
-                >
-                  <span className="font-['Cormorant_Garamond'] text-2xl font-semibold text-[#183624] group-hover:text-[#C98A3C] transition-colors relative z-10">{item.title}</span>
-                  <span className="font-['Montserrat'] text-[10px] tracking-[0.2em] text-[#183624]/60 uppercase mt-1 relative z-10">{item.sub}</span>
-                </motion.button>
-              ))}
+              <AnimatePresence mode="wait">
+                {formStatus === "success" ? (
+                  <motion.div
+                    key="success"
+                    initial={{ opacity: 0, scale: 0.9, y: 10 }}
+                    animate={{ opacity: 1, scale: 1, y: 0 }}
+                    transition={{ duration: 0.5, ease: bioEase }}
+                    className="flex flex-col items-center justify-center py-12 text-center"
+                  >
+                    <div className="w-16 h-16 rounded-full bg-[#183624]/5 flex items-center justify-center mb-6 text-[#C98A3C]">
+                      <CheckCircle2 size={32} />
+                    </div>
+                    <h3 className="font-['Cormorant_Garamond'] text-3xl font-semibold mb-3 text-[#183624]">Message Received</h3>
+                    <p className="font-['Montserrat'] text-sm leading-relaxed text-[#183624]/80 px-4">
+                      Thank you for reaching out. Emily will be in touch with you shortly. Take a deep breath, you've taken the first step.
+                    </p>
+                  </motion.div>
+                ) : (
+                  <motion.form
+                    key="form"
+                    action="https://usebasin.com/f/2f6670191032"
+                    method="POST"
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    exit={{ opacity: 0, scale: 0.95, filter: "blur(4px)" }}
+                    transition={{ duration: 0.4 }}
+                    onSubmit={handleFormSubmit}
+                    className="flex flex-col gap-5 w-full"
+                  >
+                    <div className="flex flex-col sm:flex-row gap-5 w-full">
+                      <input name="first_name" required type="text" placeholder="First Name" className="form-input flex-1" disabled={formStatus === "submitting"} />
+                      <input name="last_name" required type="text" placeholder="Last Name" className="form-input flex-1" disabled={formStatus === "submitting"} />
+                    </div>
+
+                    <input name="email" required type="email" placeholder="Email Address" className="form-input" disabled={formStatus === "submitting"} />
+
+                    <select
+                      name="interest"
+                      value={selectedInterest}
+                      onChange={(e) => setSelectedInterest(e.target.value)}
+                      className="form-input cursor-pointer"
+                      disabled={formStatus === "submitting"}
+                    >
+                      <option value="General Inquiry">General Inquiry</option>
+                      <option value="1-on-1 Sessions">1-on-1 Sessions</option>
+                      <option value="Nature Groups">Nature Groups</option>
+                      <option value="Schools & Facilities">Schools & Facilities</option>
+                      <option value="The Circle (Newsletter)">Join The Circle (Newsletter)</option>
+                    </select>
+
+                    <textarea
+                      name="message"
+                      required
+                      placeholder="Tell me a bit about what brings you here..."
+                      className="form-input resize-none"
+                      rows={4}
+                      disabled={formStatus === "submitting"}
+                    />
+
+                    <motion.button
+                      type="submit"
+                      disabled={formStatus === "submitting"}
+                      whileHover={formStatus === "idle" ? { scale: 1.02, backgroundColor: "#b57930" } : {}}
+                      whileTap={formStatus === "idle" ? { scale: 0.95, transition: squishSpring } : {}}
+                      className="mt-2 w-full rounded-2xl flex items-center justify-center font-['Montserrat'] text-[13px] tracking-[0.15em] font-semibold px-8 py-4 border-none text-white relative overflow-hidden"
+                      style={{ background: AMBER, touchAction: "manipulation" }}
+                    >
+                      {formStatus === "submitting" ? (
+                        <Loader2 className="animate-spin" size={20} />
+                      ) : (
+                        "Send Message"
+                      )}
+                    </motion.button>
+                  </motion.form>
+                )}
+              </AnimatePresence>
             </div>
           </motion.div>
         )}
       </AnimatePresence>
 
-      {/* ── Floating Sticky CTA Button (Instant Snap Return, Magnetic) ── */}
+      {/* ── Floating Sticky CTA Button ── */}
       <AnimatePresence>
-        {!activeNode && !showBookingMenu && isLoaded && (
+        {!activeNode && !showBookingMenu && (
           <div className="fixed bottom-10 left-1/2 -translate-x-1/2 z-30 pointer-events-none">
             <motion.div
               initial={{ y: 80, opacity: 0, scale: 0.9 }}
@@ -697,13 +803,9 @@ export default function App() {
               <motion.button
                 whileHover={{ scale: 1.04, y: -2, transition: squishSpring }}
                 whileTap={{ scale: 0.85, backgroundColor: "rgba(242, 239, 230, 1)", transition: squishSpring }}
-                onClick={(e) => { e.stopPropagation(); triggerHaptic([30, 20]); setShowBookingMenu(true); }}
+                onClick={(e) => { e.stopPropagation(); handleOpenForm("General Inquiry"); }}
                 className="flex items-center justify-center rounded-full glass-panel shadow-2xl backdrop-blur-xl group"
-                style={{
-                  color: C,
-                  padding: "16px 40px",
-                  touchAction: "manipulation"
-                }}
+                style={{ color: C, padding: "16px 40px", touchAction: "manipulation" }}
               >
                 <span className="font-['Montserrat'] text-[13px] tracking-[0.15em] font-bold uppercase group-hover:text-[#C98A3C] transition-colors">
                   Work with Emily
@@ -762,15 +864,15 @@ export default function App() {
 
                       <div className="w-full md:w-7/12 flex flex-col justify-center relative">
                         <p className="font-['Cormorant_Garamond'] text-[clamp(16px,1.8vw,20px)] leading-[1.6] opacity-90 m-0 tracking-[0.01em]" style={{ color: C }} dangerouslySetInnerHTML={{ __html: activeNode.desc }} />
-                        <div className="mt-6">
+                        <div className="mt-8">
                           <motion.button
-                            whileHover={{ scale: 1.03, backgroundColor: AMBER, color: "#fff" }}
-                            whileTap={{ scale: 0.9, filter: "brightness(0.9)", transition: squishSpring }}
-                            onClick={(e) => { e.stopPropagation(); triggerHaptic([20]); }}
-                            className="rounded-full transition-colors border inline-block font-['Montserrat'] text-[11px] tracking-[0.15em] font-semibold px-6 py-3"
-                            style={{ background: "transparent", borderColor: AMBER, color: C, touchAction: "manipulation" }}
+                            whileHover={{ scale: 1.02, backgroundColor: AMBER }}
+                            whileTap={{ scale: 0.95, transition: squishSpring }}
+                            onClick={(e) => { e.stopPropagation(); handleOpenForm(activeNode.interestValue); }}
+                            className="rounded-2xl transition-colors border-none inline-block font-['Montserrat'] text-[12px] tracking-[0.15em] font-bold px-8 py-4 uppercase text-white shadow-lg"
+                            style={{ background: C, touchAction: "manipulation" }}
                           >
-                            {activeNode.cta.text}
+                            {activeNode.cta}
                           </motion.button>
                         </div>
                       </div>
@@ -778,7 +880,7 @@ export default function App() {
 
                     <div className="w-full h-[1px] bg-[#C98A3C] opacity-20 mb-4 mt-2" />
 
-                    <BodyExplorer />
+                    <BodyExplorer onOpenForm={() => handleOpenForm(activeNode.interestValue)} />
                   </div>
                 ) : (
                   /* ── Standard 2-Column Layout ── */
@@ -807,31 +909,16 @@ export default function App() {
 
                       <p className="font-['Cormorant_Garamond'] text-[clamp(18px,2.1vw,22px)] leading-[1.75] opacity-90 m-0 tracking-[0.01em]" style={{ color: C }} dangerouslySetInnerHTML={{ __html: activeNode.desc }} />
 
-                      {activeNode.cta && activeNode.cta.type === "button" && (
+                      {activeNode.cta && (
                         <div className="mt-8">
                           <motion.button
-                            whileHover={{ scale: 1.03, backgroundColor: AMBER, color: "#fff" }}
-                            whileTap={{ scale: 0.9, filter: "brightness(0.9)", transition: squishSpring }}
-                            onClick={(e) => { e.stopPropagation(); triggerHaptic([20]); }}
-                            className="rounded-full transition-colors border font-['Montserrat'] text-[12px] tracking-[0.15em] font-semibold px-8 py-3.5"
-                            style={{ background: "transparent", borderColor: AMBER, color: C, touchAction: "manipulation" }}
+                            whileHover={{ scale: 1.02, backgroundColor: AMBER }}
+                            whileTap={{ scale: 0.95, transition: squishSpring }}
+                            onClick={(e) => { e.stopPropagation(); handleOpenForm(activeNode.interestValue); }}
+                            className="rounded-2xl transition-colors border-none font-['Montserrat'] text-[12px] tracking-[0.15em] font-bold px-8 py-4 uppercase text-white shadow-lg w-fit"
+                            style={{ background: C, touchAction: "manipulation" }}
                           >
-                            {activeNode.cta.text}
-                          </motion.button>
-                        </div>
-                      )}
-
-                      {activeNode.cta && activeNode.cta.type === "input" && (
-                        <div className="mt-8 flex flex-col sm:flex-row gap-3 max-w-md">
-                          <input type="email" placeholder="Your email address..." className="w-full rounded-full outline-none focus:border-[#C98A3C] transition-colors bg-[#183624]/5 border border-[#183624]/10 font-['Montserrat'] text-[14px] px-6 py-3.5" style={{ color: C }} />
-                          <motion.button
-                            whileHover={{ scale: 1.03, backgroundColor: "#b57930" }}
-                            whileTap={{ scale: 0.9, filter: "brightness(0.9)", transition: squishSpring }}
-                            onClick={(e) => { e.stopPropagation(); triggerHaptic([20]); }}
-                            className="rounded-full flex-shrink-0 font-['Montserrat'] text-[12px] tracking-[0.15em] font-semibold px-8 py-3.5 border-none text-white"
-                            style={{ background: AMBER, touchAction: "manipulation" }}
-                          >
-                            {activeNode.cta.text}
+                            {activeNode.cta}
                           </motion.button>
                         </div>
                       )}
@@ -868,7 +955,7 @@ export default function App() {
       {/* ── Footer ── */}
       <motion.div
         initial={{ opacity: 0 }}
-        animate={{ opacity: isLoaded ? 1 : 0 }}
+        animate={{ opacity: 1 }}
         transition={{ duration: 1.5, delay: 1.5, ease: bioEase }}
         className="absolute bottom-3 left-0 w-full text-center z-10 pointer-events-none"
       >
