@@ -489,16 +489,38 @@ export default function App() {
   }
 
   return (
-    <main className="relative w-full h-screen overflow-hidden bg-[#EAE5D4]">
+    <main className="relative w-full h-[100dvh] overflow-hidden overscroll-none bg-[#EAE5D4]">
       <style
         dangerouslySetInnerHTML={{
           __html: `
         @import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;1,400;1,500&family=Dancing+Script:wght@600&family=Montserrat:wght@400;500;600;700&display=swap');
 
+        /* ── Full-screen lock: prevent overscroll, pull-to-refresh, bounce ── */
+        html, body {
+          margin: 0;
+          padding: 0;
+          width: 100%;
+          height: 100%;
+          overflow: hidden;
+          overscroll-behavior: none;
+          -webkit-overflow-scrolling: auto;
+          position: fixed;
+          inset: 0;
+          -webkit-tap-highlight-color: transparent;
+          -webkit-touch-callout: none;
+        }
+        #root {
+          width: 100%;
+          height: 100%;
+          overflow: hidden;
+          overscroll-behavior: none;
+        }
+
         strong { font-weight: 600; color: ${C}; opacity: 1; }
         a { color: ${AMBER}; text-decoration: none; border-bottom: 1px dotted rgba(201, 138, 60, 0.5); transition: all 0.3s ease; }
         a:hover { border-bottom: 1px solid ${AMBER}; opacity: 0.9; }
 
+        .editorial-scroll { overscroll-behavior: contain; }
         .editorial-scroll::-webkit-scrollbar { width: 4px; }
         .editorial-scroll::-webkit-scrollbar-track { background: transparent; }
         .editorial-scroll::-webkit-scrollbar-thumb { background: rgba(24, 54, 36, 0.2); border-radius: 10px; }
@@ -590,7 +612,7 @@ export default function App() {
           <motion.image
             href={IMG_URL}
             x="0" y="0" width="800" height="1100"
-            preserveAspectRatio="xMidYMid meet" crossOrigin="anonymous"
+            preserveAspectRatio="xMidYMid meet"
             initial={{ opacity: 0 }}
             animate={{ opacity: 0.9 }}
             transition={{ duration: 2.5, ease: bioEase }}
