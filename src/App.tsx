@@ -2,20 +2,20 @@
 
 import React, { useState, useEffect, useRef } from "react"
 import { motion, AnimatePresence } from "framer-motion"
-import { X, ArrowLeft, ArrowRight, CheckCircle2, Loader2, Wind } from "lucide-react"
+import { X, ArrowLeft, ArrowRight, CheckCircle2, Loader2, Phone } from "lucide-react"
 
 // ── Theme Constants ──
 const C = "#183624"
 const BG = "#EAE5D4"
 const AMBER = "#C98A3C"
+const CANONICAL_URL = "https://www.theheartofnoticing.com"
 
 // ── Asset URLs ──
 const IMG_URL = "https://pub-f30bd9ec57cb4bbfb41bc8336c0bbf81.r2.dev/TheHeartOfNoticing/MainTree.webp"
 const BIRD_OPEN = "https://pub-f30bd9ec57cb4bbfb41bc8336c0bbf81.r2.dev/TheHeartOfNoticing/BirdSpriteOpenWings.webp"
 const BIRD_CLOSED = "https://pub-f30bd9ec57cb4bbfb41bc8336c0bbf81.r2.dev/TheHeartOfNoticing/BirdSpriteClosedWings.webp"
 const ACORN_URL = "https://pub-f30bd9ec57cb4bbfb41bc8336c0bbf81.r2.dev/TheHeartOfNoticing/Acorn.webp"
-const STENCIL_GIF = "https://pub-f30bd9ec57cb4bbfb41bc8336c0bbf81.r2.dev/TheHeartOfNoticing/IMG_5166.gif"
-const EMILY_GIF = "https://pub-f30bd9ec57cb4bbfb41bc8336c0bbf81.r2.dev/TheHeartOfNoticing/IMG_5179.gif"
+const EMILY_GIF = "https://pub-f30bd9ec57cb4bbfb41bc8336c0bbf81.r2.dev/TheHeartOfNoticing/emily%20animation%20new.gif"
 
 // ── Fixed Scaling Wrapper ──
 const TRACE_TRANSFORM = "translate(400, 565) scale(0.97) translate(-400, -540)"
@@ -76,7 +76,7 @@ const NODES = [
   {
     id: "guide", x: 400, y: 235,
     labelLines: [{ text: "The Guide", font: "serif" }, { text: "MEET EMILY", font: "sans" }],
-    desc: "<strong>I'm not here to fix you. I'm here to breathe with you.</strong> I'm a recovered people-pleaser and overthinker who learned how to find quiet in the chaos. I hold a safe, welcoming space for kids, adults, and groups to just come as they are. No pressure, no perfection. Just breathing.",
+    desc: "<strong>I’ve always been drawn to the small things, the way sunlight moves through leaves, the way the bees dance while pollinating flowers, shadows of plants cast to the ground at golden hour…</strong><br/><br/>For a long time, though, I was much better at noticing everyone else than I was at noticing myself. I was a people-pleaser who always looked outside of myself for the answers that I wanted.<br/><br/>Then, breathwork and nature connection began teaching me something new! How to turn my attention inward. How to listen to my body. How to sit with what I’m feeling instead of immediately trying to change it. How to trust myself a little more.<br/><br/>What started for me as a personal practice became a calling. I began guiding others through breathwork and meditation and intentional moments of slowing down, to reconnect with themselves.<br/><br/>I don’t believe we’re meant to have everything figured out. And I don’t believe we need to be fixed. Sometimes, we just need someone to hold some space for us to sit with ourselves. The silence of slowing can honestly be daunting!<br/><br/>My hope is that each session helps you feel a little more connection and a deeper trust in yourself.<br/><br/>The magic lives within you, it’s just waiting for you to NOTICE!! ♥️ -Em",
     cta: null,
     interestValue: "General Inquiry"
   },
@@ -90,7 +90,7 @@ const NODES = [
   {
     id: "earth", x: 540, y: 815,
     labelLines: [{ text: "Notice the Earth", font: "serif" }, { text: "NATURE GROUPS", font: "sans" }],
-    desc: "<strong>There is a deep peace in breathing outside together.</strong> Join me for small, guided group sessions in the fresh air of Lancaster County. We'll step away from the screens, get our feet on the ground, and learn how to borrow the calm, slow rhythm of the natural world.",
+    desc: "<strong>There is a different kind of peace that comes from breathing outside!</strong><br/><br/>For over five years, I’ve been learning to forage and identify plants, spend time with trees, and practice meditation and observation in nature. The more time I spend paying attention, the more I realize how much the natural world has to teach us when we slow down enough to listen.<br/><br/>These small, guided sessions are an invitation to step away from the screens, get your feet on the ground, and reconnect with the place around you.<br/><br/>We’ll practice simple meditation, explore the plants and trees around us, and learn how to become quieter and more receptive to what’s growing, moving, changing, and communicating with us. The option to begin a nature journal is also available.<br/><br/>You don’t need to know anything about plants or meditation to join. Just bring your curiosity.<br/><br/>Come breathe. Come notice. Come see what happens when you give the living world your full attention!!!",
     cta: "Reserve Your Spot",
     interestValue: "Nature Groups"
   },
@@ -104,7 +104,7 @@ const NODES = [
   {
     id: "circle", x: 120, y: 370,
     labelLines: [{ text: "Stay Close", font: "serif" }, { text: "THE CIRCLE", font: "sans" }],
-    desc: "<strong>Not ready to jump in? That's perfectly okay.</strong> Join 'The Circle', my personal check-in list. It’s just real, gentle emails from me (never automated) sharing little reminders to breathe and notice the good things around you.",
+    desc: "<strong>A little space to stay connected.</strong><br/><br/>Not ready to jump in? That’s perfectly okay. Join The Circle, my personal check-in list. It’s just real, gentle emails from me (never automated) with updates on upcoming sessions, the calendar, and things taking shape within the practice.<br/><br/>You’ll also receive personal writings, little pieces of inspiration, artwork, and gentle reminders to breathe and notice the good things around you.",
     cta: "Join The Circle",
     interestValue: "The Circle (Newsletter)"
   },
@@ -147,6 +147,38 @@ const BODY_STEPS = [
     text: "<strong>It's hard to feel calm when you feel disconnected.</strong> We spend so much time indoors and on screens that we forget what it feels like to just stand still. We will practice getting your feet back on the earth, exploring how simply noticing the ground beneath you can help your whole body feel steady and secure."
   }
 ]
+
+// ── SEO JSON-LD STRUCTURED DATA ──
+const structuredData = {
+  "@context": "https://schema.org",
+  "@type": "HealthAndBeautyBusiness", // Ideal sub-type for wellness/somatic guides
+  "name": "The Heart of Noticing",
+  "image": IMG_URL,
+  "description": "Somatic breathwork, 1-on-1 sessions, and guided nature groups to help you slow down and reconnect.",
+  "url": CANONICAL_URL, // Injected Exact Canonical URL
+  "telephone": "+1-717-341-4153",
+  "areaServed": {
+    "@type": "Place",
+    "name": "Lancaster County, PA"
+  },
+  "founder": {
+    "@type": "Person",
+    "name": "Emily"
+  },
+  "hasOfferCatalog": {
+    "@type": "OfferCatalog",
+    "name": "Somatic Breathwork Services",
+    "itemListElement": NODES.filter(n => n.interestValue !== "General Inquiry").map((node, index) => ({
+      "@type": "Offer",
+      "itemOffered": {
+        "@type": "Service",
+        "name": node.labelLines.map(l => l.text).join(" "),
+        "description": node.desc.replace(/<[^>]*>?/gm, '') // Strip HTML for schema
+      },
+      "position": index + 1
+    }))
+  }
+}
 
 // ── Redesigned Body Explorer ──
 function BodyExplorer({ onOpenForm }) {
@@ -202,6 +234,7 @@ function BodyExplorer({ onOpenForm }) {
             onClick={(e) => { e.stopPropagation(); handlePrev(); }}
             className="flex items-center justify-center rounded-full transition-colors relative overflow-visible group"
             style={{ width: 44, height: 44, border: `1px solid ${C}25`, color: C, touchAction: "manipulation" }}
+            aria-label="Previous Body Area"
           >
             <div className="absolute inset-0 bg-[#C98A3C] opacity-0 group-hover:opacity-10 rounded-full transition-opacity"/>
             <ArrowLeft size={18} strokeWidth={1.5} className="group-hover:text-[#C98A3C] transition-colors" />
@@ -213,6 +246,7 @@ function BodyExplorer({ onOpenForm }) {
             onClick={(e) => { e.stopPropagation(); handleNext(); }}
             className="flex items-center justify-center rounded-full transition-colors relative overflow-visible group"
             style={{ width: 44, height: 44, border: `1px solid ${C}25`, color: C, touchAction: "manipulation" }}
+            aria-label="Next Body Area"
           >
             <div className="absolute inset-0 bg-[#C98A3C] opacity-0 group-hover:opacity-10 rounded-full transition-opacity"/>
             <ArrowRight size={18} strokeWidth={1.5} className="group-hover:text-[#C98A3C] transition-colors"/>
@@ -240,6 +274,8 @@ function BodyExplorer({ onOpenForm }) {
                   animate={{ scale: isActive ? [1, 1.03, 1] : 1, fill: isActive ? AMBER : C, opacity: isActive ? 1 : 0.4 }}
                   transition={{ scale: { duration: 8, repeat: Infinity, ease: "easeInOut" }, fill: { duration: 0.6, ease: bioEase }, opacity: { duration: 0.6, ease: bioEase } }}
                   style={{ position: "absolute", left: "50%", marginLeft: p.ml, top: p.top, zIndex: p.z || 1, cursor: isClickable ? "pointer" : "default", overflow: "visible", touchAction: "manipulation" }}
+                  role="button"
+                  aria-label={`Highlight ${p.id} area`}
                 >
                   {/* Invisible Hitbox Rectangle for solid tapping anywhere in the bounding box */}
                   <rect x="0" y="0" width={p.w} height={p.h} fill="rgba(0,0,0,0)" pointerEvents="all" />
@@ -307,6 +343,7 @@ function HeaderBird() {
         opacity: pos.opacity,
         transition: `transform ${pos.duration}s linear, opacity 0.6s ease`,
       }}
+      aria-hidden="true" /* Decorative animation */
     >
       <g transform={`scale(${direction}, 1)`}>
         <image href={wingsOpen ? BIRD_OPEN : BIRD_CLOSED} x="-25" y="-25" width="50" height="50" />
@@ -373,6 +410,7 @@ function HoleBird() {
         opacity: pos.opacity,
         transition: `transform ${pos.duration}s ease-in-out, opacity 0.6s ease`,
       }}
+      aria-hidden="true" /* Decorative animation */
     >
       <g transform={`scale(${direction}, 1)`}>
         <image href={wingsOpen ? BIRD_OPEN : BIRD_CLOSED} x="-20" y="-20" width="40" height="40" />
@@ -384,7 +422,7 @@ function HoleBird() {
 function AcornNode({ size, active }) {
   const col = active ? "#2a6040" : C
   return (
-    <svg x={-size} y={-size} width={size * 2} height={size * 2} viewBox="-50 -50 100 100" style={{ overflow: "visible", pointerEvents: "none" }}>
+    <svg x={-size} y={-size} width={size * 2} height={size * 2} viewBox="-50 -50 100 100" style={{ overflow: "visible", pointerEvents: "none" }} aria-hidden="true">
       {active && <circle cx="0" cy="0" r="58" fill="none" stroke={col} strokeWidth="4" opacity="0.5" />}
       <image href={ACORN_URL} x="-50" y="-50" width="100" height="100" transform="rotate(14)" />
     </svg>
@@ -405,21 +443,17 @@ export default function App() {
 
   const activeNode = NODES.find((n) => n.id === activeId) ?? null
 
-  const [blobs, setBlobs] = useState({ guide: null, room: null })
+  const [blobs, setBlobs] = useState({ guide: null })
   const [activeGifSrc, setActiveGifSrc] = useState(null)
 
   useEffect(() => {
     fetch(EMILY_GIF).then(r => r.blob()).then(b => setBlobs(p => ({ ...p, guide: b })))
-    fetch(STENCIL_GIF).then(r => r.blob()).then(b => setBlobs(p => ({ ...p, room: b })))
   }, [])
 
   useEffect(() => {
     let url = null;
     if (activeId === "guide") {
       url = blobs.guide ? URL.createObjectURL(blobs.guide) : `${EMILY_GIF}?t=${Date.now()}`
-      setActiveGifSrc(url)
-    } else if (activeId === "room") {
-      url = blobs.room ? URL.createObjectURL(blobs.room) : `${STENCIL_GIF}?t=${Date.now()}`
       setActiveGifSrc(url)
     } else {
       setActiveGifSrc(null)
@@ -456,7 +490,7 @@ export default function App() {
     triggerHaptic([30, 20]);
     setSelectedInterest(interestValue);
     setFormStatus("idle");
-    setActiveId(null); // Close editorial modal if open
+    setActiveId(null);
     setShowBookingMenu(true);
   }
 
@@ -490,6 +524,27 @@ export default function App() {
 
   return (
     <main className="relative w-full h-[100dvh] overflow-hidden overscroll-none bg-[#EAE5D4]">
+
+      {/* ── SEO: React 19 / Next.js Static Document Hoisted Metadata & Tags ── */}
+      <title>The Heart of Noticing | Somatic Breathwork in Lancaster, PA</title>
+      <meta name="description" content="Join Emily in Lancaster County, PA for somatic breathwork, 1-on-1 sessions, and guided nature groups. Slow down and reconnect with yourself." />
+
+      {/* ── SEO: Injected Canonical URL ── */}
+      <link rel="canonical" href={CANONICAL_URL} />
+
+      {/* ── SEO: Open Graph Social Tags ── */}
+      <meta property="og:title" content="The Heart of Noticing | Somatic Breathwork" />
+      <meta property="og:description" content="Join Emily in Lancaster County, PA for somatic breathwork, 1-on-1 sessions, and guided nature groups." />
+      <meta property="og:url" content={CANONICAL_URL} />
+      <meta property="og:type" content="website" />
+      <meta property="og:image" content={IMG_URL} />
+
+      {/* ── SEO: JSON-LD Structured Data ── */}
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(structuredData) }}
+      />
+
       <style
         dangerouslySetInnerHTML={{
           __html: `
@@ -560,9 +615,37 @@ export default function App() {
           background-size: 1em;
           padding-right: 40px;
         }
+
+        /* Technical SEO: Visually hide semantic content that crawlers need to read, without triggering penalties for hidden text (standard accessibility pattern). */
+        .sr-only {
+          position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px;
+          overflow: hidden; clip: rect(0, 0, 0, 0); whiteSpace: nowrap; border: 0;
+        }
       `,
         }}
       />
+
+      {/* ── SEO: Semantic HTML Layer (Visually Hidden, Fully Crawlable) ── */}
+      <div className="sr-only">
+        <h1>The Heart of Noticing - Somatic Breathwork in Lancaster County, PA</h1>
+        <p>A personal practice and calling by Emily, helping you slow down and reconnect with yourself through breathwork and meditation.</p>
+
+        <h2>Our Offerings & Services</h2>
+        {NODES.map(node => (
+          <article key={`seo-node-${node.id}`}>
+            <h3>{node.labelLines.map(l => l.text).join(" - ")}</h3>
+            <div dangerouslySetInnerHTML={{ __html: node.desc }} />
+          </article>
+        ))}
+
+        <h2>Notice the Body: Areas of Healing</h2>
+        {BODY_STEPS.map(step => (
+          <article key={`seo-body-${step.id}`}>
+            <h3>{step.title}: {step.eyebrow}</h3>
+            <div dangerouslySetInnerHTML={{ __html: step.text }} />
+          </article>
+        ))}
+      </div>
 
       {/* ── Ambient Breathing Halo ── */}
       <motion.div
@@ -575,6 +658,7 @@ export default function App() {
           ]
         }}
         transition={{ duration: 11, repeat: Infinity, ease: "easeInOut" }}
+        aria-hidden="true"
       />
 
       {/* ── Main Fluid SVG Container ── */}
@@ -583,6 +667,8 @@ export default function App() {
           viewBox="0 0 800 1100"
           className="w-full h-full max-h-[1100px] object-contain md:object-cover origin-center"
           preserveAspectRatio="xMidYMid meet"
+          role="img"
+          aria-label="Interactive illustration of a tree representing somatic breathwork offerings"
         >
           <defs>
             <linearGradient id="ethereal-flow" x1="0%" y1="100%" x2="100%" y2="0%">
@@ -618,8 +704,8 @@ export default function App() {
             transition={{ duration: 2.5, ease: bioEase }}
           />
 
-          {/* Header Typography */}
-          <motion.g id="header" clipPath="url(#header-reveal)" initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 1.5, ease: bioEase }}>
+          {/* Header Typography (Visual text, semantic text is hidden in sr-only div for SEO) */}
+          <motion.g id="header" clipPath="url(#header-reveal)" initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 1.5, ease: bioEase }} aria-hidden="true">
             <text x="400" y="43" textAnchor="middle" fontFamily="'Cormorant Garamond', serif" fontStyle="italic" fontSize="29" fill={C}>the</text>
             <motion.text x="400" y="120" textAnchor="middle" fontFamily="'Dancing Script', cursive" fontSize="102" fontWeight="600" fill={C} animate={{ opacity: [0.92, 1, 0.92] }} transition={{ duration: 10, repeat: Infinity, ease: "easeInOut" }}>Heart of Noticing</motion.text>
             <text x="400" y="167" textAnchor="middle" fontFamily="'Montserrat', sans-serif" fontSize="16" letterSpacing="0.25em" fontWeight="500" fill={C} opacity={0.9}>SOMATIC BREATHWORK • LANCASTER COUNTY, PA</text>
@@ -648,7 +734,7 @@ export default function App() {
           </g>
 
           {/* Birds */}
-          <g id="animated-birds"><HeaderBird /><HoleBird /></g>
+          <g id="animated-birds" aria-hidden="true"><HeaderBird /><HoleBird /></g>
 
           {/* Interactive Acorn Nodes */}
           <motion.g id="interactive-nodes" initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 2.5, delay: 0.8, ease: slowBioEase }}>
@@ -663,6 +749,8 @@ export default function App() {
                     whileTap={{ scale: 0.9, transition: squishSpring }}
                     whileHover={{ scale: 1.05, transition: squishSpring }}
                     style={{ cursor: "pointer", touchAction: "manipulation" }}
+                    role="button"
+                    aria-label={`Learn more about ${node.labelLines[1].text}`}
                   >
                     <circle r={110} fill="transparent" pointerEvents="all" />
                     <motion.g
@@ -700,6 +788,7 @@ export default function App() {
             transition={{ duration: 0.6, ease: bioEase }}
             className="fixed inset-0 z-40 bg-[#183624]/40 backdrop-blur-md cursor-pointer"
             onClick={(e) => { e.stopPropagation(); setActiveId(null); setShowBookingMenu(false); }}
+            aria-hidden="true"
           />
         )}
       </AnimatePresence>
@@ -713,6 +802,9 @@ export default function App() {
             exit={{ x: "-50%", y: "-45%", scale: 0.95, opacity: 0, filter: "blur(4px)" }}
             transition={{ duration: 0.5, ease: slowBioEase }}
             className="fixed z-50 flex flex-col top-1/2 left-1/2 w-[92%] max-w-[500px] max-h-[85vh] glass-panel rounded-[32px] overflow-hidden"
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="booking-title"
           >
             <motion.button
               whileHover={{ scale: 1.1, rotate: 90, backgroundColor: "rgba(201,138,60,0.1)" }}
@@ -720,6 +812,7 @@ export default function App() {
               onClick={(e) => { e.stopPropagation(); triggerHaptic([15]); setShowBookingMenu(false); }}
               className="absolute top-5 right-5 text-[#183624] opacity-50 hover:opacity-100 transition-all rounded-full p-2 z-20"
               style={{ touchAction: "manipulation" }}
+              aria-label="Close form"
             >
               <X size={22} />
             </motion.button>
@@ -727,7 +820,7 @@ export default function App() {
             <div ref={scrollRef} onScroll={checkScroll} className="editorial-scroll w-full h-full overflow-y-auto px-8 py-10 md:px-10 md:py-12">
               <div className="flex flex-col items-center text-center">
                 <p className="font-['Montserrat'] text-[11px] tracking-[0.25em] font-semibold mb-2" style={{ color: AMBER }}>TAKE A BREATH</p>
-                <h2 className="font-['Dancing_Script'] text-[44px] leading-[1.05] mb-8" style={{ color: C }}>Connect with Emily</h2>
+                <h2 id="booking-title" className="font-['Dancing_Script'] text-[44px] leading-[1.05] mb-8" style={{ color: C }}>Connect with Emily</h2>
               </div>
 
               <AnimatePresence mode="wait">
@@ -748,62 +841,93 @@ export default function App() {
                     </p>
                   </motion.div>
                 ) : (
-                  <motion.form
-                    key="form"
-                    action="https://usebasin.com/f/2f6670191032"
-                    method="POST"
+                  <motion.div
+                    key="form-wrapper"
                     initial={{ opacity: 0 }}
                     animate={{ opacity: 1 }}
                     exit={{ opacity: 0, scale: 0.95, filter: "blur(4px)" }}
                     transition={{ duration: 0.4 }}
-                    onSubmit={handleFormSubmit}
-                    className="flex flex-col gap-5 w-full"
+                    className="flex flex-col w-full"
                   >
-                    <div className="flex flex-col sm:flex-row gap-5 w-full">
-                      <input name="first_name" required type="text" placeholder="First Name" className="form-input flex-1" disabled={formStatus === "submitting"} />
-                      <input name="last_name" required type="text" placeholder="Last Name" className="form-input flex-1" disabled={formStatus === "submitting"} />
+                    <form
+                      action="https://usebasin.com/f/2f6670191032"
+                      method="POST"
+                      onSubmit={handleFormSubmit}
+                      className="flex flex-col gap-5 w-full"
+                    >
+                      <div className="flex flex-col sm:flex-row gap-5 w-full">
+                        <input name="first_name" required type="text" placeholder="First Name" className="form-input flex-1" disabled={formStatus === "submitting"} />
+                        <input name="last_name" required type="text" placeholder="Last Name" className="form-input flex-1" disabled={formStatus === "submitting"} />
+                      </div>
+
+                      <input name="email" required type="email" placeholder="Email Address" className="form-input" disabled={formStatus === "submitting"} />
+
+                      <select
+                        name="interest"
+                        value={selectedInterest}
+                        onChange={(e) => setSelectedInterest(e.target.value)}
+                        className="form-input cursor-pointer"
+                        disabled={formStatus === "submitting"}
+                        aria-label="Area of interest"
+                      >
+                        <option value="General Inquiry">General Inquiry</option>
+                        <option value="1-on-1 Sessions">1-on-1 Sessions</option>
+                        <option value="Nature Groups">Nature Groups</option>
+                        <option value="Schools & Facilities">Schools & Facilities</option>
+                        <option value="The Circle (Newsletter)">Join The Circle (Newsletter)</option>
+                      </select>
+
+                      <textarea
+                        name="message"
+                        required
+                        placeholder="Tell me a bit about what brings you here..."
+                        className="form-input resize-none"
+                        rows={4}
+                        disabled={formStatus === "submitting"}
+                      />
+
+                      <motion.button
+                        type="submit"
+                        disabled={formStatus === "submitting"}
+                        whileHover={formStatus === "idle" ? { scale: 1.02, backgroundColor: "#b57930" } : {}}
+                        whileTap={formStatus === "idle" ? { scale: 0.95, transition: squishSpring } : {}}
+                        className="mt-2 w-full rounded-2xl flex items-center justify-center font-['Montserrat'] text-[13px] tracking-[0.15em] font-semibold px-8 py-4 border-none text-white relative overflow-hidden"
+                        style={{ background: AMBER, touchAction: "manipulation" }}
+                      >
+                        {formStatus === "submitting" ? (
+                          <Loader2 className="animate-spin" size={20} />
+                        ) : (
+                          "Send Message"
+                        )}
+                      </motion.button>
+                    </form>
+
+                    {/* ── The Elegant "Or Call" Divider & Button ── */}
+                    <div
+                      className="flex items-center gap-4 mt-6 mb-4 w-full"
+                      style={{ opacity: formStatus === "submitting" ? 0.5 : 1, transition: "opacity 0.3s ease" }}
+                    >
+                      <div className="h-[1px] flex-1 bg-[#183624]/10"></div>
+                      <span className="font-['Montserrat'] text-[10px] tracking-[0.2em] font-semibold text-[#183624]/40 uppercase">Or Reach Out Directly</span>
+                      <div className="h-[1px] flex-1 bg-[#183624]/10"></div>
                     </div>
 
-                    <input name="email" required type="email" placeholder="Email Address" className="form-input" disabled={formStatus === "submitting"} />
-
-                    <select
-                      name="interest"
-                      value={selectedInterest}
-                      onChange={(e) => setSelectedInterest(e.target.value)}
-                      className="form-input cursor-pointer"
-                      disabled={formStatus === "submitting"}
-                    >
-                      <option value="General Inquiry">General Inquiry</option>
-                      <option value="1-on-1 Sessions">1-on-1 Sessions</option>
-                      <option value="Nature Groups">Nature Groups</option>
-                      <option value="Schools & Facilities">Schools & Facilities</option>
-                      <option value="The Circle (Newsletter)">Join The Circle (Newsletter)</option>
-                    </select>
-
-                    <textarea
-                      name="message"
-                      required
-                      placeholder="Tell me a bit about what brings you here..."
-                      className="form-input resize-none"
-                      rows={4}
-                      disabled={formStatus === "submitting"}
-                    />
-
-                    <motion.button
-                      type="submit"
-                      disabled={formStatus === "submitting"}
-                      whileHover={formStatus === "idle" ? { scale: 1.02, backgroundColor: "#b57930" } : {}}
+                    <motion.a
+                      href="tel:+17173414153"
+                      onClick={() => triggerHaptic([20])}
+                      whileHover={formStatus === "idle" ? { scale: 1.02, backgroundColor: "rgba(24, 54, 36, 0.05)" } : {}}
                       whileTap={formStatus === "idle" ? { scale: 0.95, transition: squishSpring } : {}}
-                      className="mt-2 w-full rounded-2xl flex items-center justify-center font-['Montserrat'] text-[13px] tracking-[0.15em] font-semibold px-8 py-4 border-none text-white relative overflow-hidden"
-                      style={{ background: AMBER, touchAction: "manipulation" }}
+                      className="w-full rounded-2xl flex items-center justify-center gap-3 font-['Montserrat'] text-[13px] tracking-[0.15em] font-semibold px-8 py-4 border border-[#183624]/20 text-[#183624] relative overflow-hidden transition-colors"
+                      style={{
+                        touchAction: "manipulation",
+                        pointerEvents: formStatus === "submitting" ? "none" : "auto",
+                        opacity: formStatus === "submitting" ? 0.5 : 1
+                      }}
                     >
-                      {formStatus === "submitting" ? (
-                        <Loader2 className="animate-spin" size={20} />
-                      ) : (
-                        "Send Message"
-                      )}
-                    </motion.button>
-                  </motion.form>
+                      <Phone size={16} className="opacity-70" />
+                      <span>Call +1 (717) 341-4153</span>
+                    </motion.a>
+                  </motion.div>
                 )}
               </AnimatePresence>
             </div>
@@ -854,6 +978,8 @@ export default function App() {
               height: "85vh", maxHeight: "800px",
               borderRadius: "32px",
             }}
+            role="dialog"
+            aria-modal="true"
           >
             {/* ── Sticky Close Button ── */}
             <motion.button
@@ -922,10 +1048,15 @@ export default function App() {
                         <motion.img
                           initial={{ opacity: 0, y: 10 }}
                           animate={{ opacity: 0.85, y: 0 }}
-                          transition={{ duration: 0.5, ease: "easeOut", delay: 0.2 }}
-                          src={activeGifSrc} alt="Visual Element"
-                          className="float-right ml-6 mb-4 w-[35%] max-w-[160px] object-contain rounded-2xl shadow-sm"
-                          style={{ mixBlendMode: "multiply" }}
+                          transition={{ duration: 0.7, ease: "easeOut", delay: 0.2 }}
+                          src={activeGifSrc}
+                          alt="Emily, somatic breathwork guide, warmly greeting you."
+                          className="float-right ml-6 mb-4 w-[40%] max-w-[180px] object-contain"
+                          style={{
+                            mixBlendMode: "multiply",
+                            WebkitMaskImage: "radial-gradient(ellipse at center, rgba(0,0,0,1) 50%, rgba(0,0,0,0) 95%)",
+                            maskImage: "radial-gradient(ellipse at center, rgba(0,0,0,1) 50%, rgba(0,0,0,0) 95%)"
+                          }}
                         />
                       )}
 
@@ -982,7 +1113,7 @@ export default function App() {
         className="absolute bottom-3 left-0 w-full text-center z-10 pointer-events-none"
       >
         <p className="font-['Montserrat'] text-[9px] tracking-[0.15em] font-medium uppercase text-[#183624] opacity-40 m-0">
-          © 2026 Media Mack Designs. All Rights Reserved
+          © 2026 The Heart of Noticing. All Rights Reserved
         </p>
       </motion.div>
     </main>
