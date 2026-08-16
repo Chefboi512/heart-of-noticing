@@ -12,6 +12,7 @@ const CANONICAL_URL = "https://www.theheartofnoticing.com"
 
 // ── Asset URLs ──
 const IMG_URL = "https://pub-f30bd9ec57cb4bbfb41bc8336c0bbf81.r2.dev/TheHeartOfNoticing/MainTree.webp"
+const OG_IMAGE_URL = "https://www.theheartofnoticing.com/og-image.jpg"
 const BIRD_OPEN = "https://pub-f30bd9ec57cb4bbfb41bc8336c0bbf81.r2.dev/TheHeartOfNoticing/BirdSpriteOpenWings.webp"
 const BIRD_CLOSED = "https://pub-f30bd9ec57cb4bbfb41bc8336c0bbf81.r2.dev/TheHeartOfNoticing/BirdSpriteClosedWings.webp"
 const ACORN_URL = "https://pub-f30bd9ec57cb4bbfb41bc8336c0bbf81.r2.dev/TheHeartOfNoticing/Acorn.webp"
@@ -537,7 +538,7 @@ export default function App() {
       <meta property="og:description" content="Join Emily in Lancaster County, PA for somatic breathwork, 1-on-1 sessions, and guided nature groups." />
       <meta property="og:url" content={CANONICAL_URL} />
       <meta property="og:type" content="website" />
-      <meta property="og:image" content={IMG_URL} />
+      <meta property="og:image" content={OG_IMAGE_URL} />
 
       {/* ── SEO: JSON-LD Structured Data ── */}
       <script
