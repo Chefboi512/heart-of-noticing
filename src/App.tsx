@@ -1,7 +1,7 @@
 "use client"
 
-import React, { useState, useEffect, useRef } from "react"
-import { motion, AnimatePresence } from "framer-motion"
+import React, { useState, useEffect, useRef, memo } from "react"
+import { motion, AnimatePresence, MotionConfig } from "framer-motion"
 import { X, ArrowLeft, ArrowRight, CheckCircle2, Loader2, Phone } from "lucide-react"
 
 // ── Theme Constants ──
@@ -70,6 +70,16 @@ const TRACED_PATHS = [
   { name: "Limb Three", dx: -14, dy: 0, delay: 2, duration: 22, d: "M 405.9,623.5 L 427.5,537.3 L 411.8,498.0 L 423.5,484.3 L 437.3,462.7 L 454.9,466.7 L 443.1,490.2 L 449.0,515.7 L 452.9,531.4 L 482.4,431.4 L 454.9,384.3 L 429.4,333.3 L 411.8,303.9 L 541.2,321.6 L 588.2,356.9 L 643.1,396.1 L 645.1,409.8 L 613.7,419.6 L 588.2,437.3 L 568.6,447.1 L 562.7,464.7 L 584.3,478.4 L 486.3,502.0 L 470.6,552.9 L 447.1,611.8 L 409.8,627.5" },
   { name: "Limb Four", dx: -14, dy: -9, delay: 11, duration: 19, d: "M 435.3,617.6 L 488.2,588.2 L 496.1,549.0 L 494.1,515.7 L 525.5,505.9 L 551.0,535.3 L 523.5,552.9 L 517.6,576.5 L 533.3,572.5 L 552.9,558.8 L 568.6,566.7 L 570.6,568.6 L 566.7,578.4 L 607.8,584.3 L 627.5,564.7 L 629.4,586.3 L 672.5,554.9 L 692.2,509.8 L 702.0,482.4 L 713.7,498.0 L 741.2,602.0 L 737.3,615.7 L 719.6,605.9 L 676.5,584.3 L 651.0,594.1 L 633.3,607.8 L 598.0,596.1 L 574.5,594.1 L 551.0,605.9 L 519.6,611.8 L 486.3,613.7 L 464.7,635.3 L 458.8,643.1 L 433.3,621.6" },
   { name: "Outline of Bottom Roots", dx: 0, dy: 0, delay: 14, duration: 24, d: "M 349.0,949.0 L 321.6,970.6 L 274.5,1000.0 L 227.5,1023.5 L 203.9,1037.3 L 158.8,1051.0 L 137.3,1056.9 L 121.6,1080.4 L 102.0,1096.1 M 464.7,931.4 L 486.3,974.5 L 539.2,996.1 L 580.4,1021.6 L 605.9,1033.3 L 654.9,1045.1 L 686.3,1066.7 L 698.0,1082.4 L 729.4,1098.0" },
+]
+
+// Smoothed once at load instead of on every render
+const SMOOTH_TRACES = TRACED_PATHS.map((p) => ({ ...p, smooth: smoothPath(p.d) }))
+
+// Soft glow drawn with layered strokes instead of a live blur filter (much cheaper to repaint)
+const GLOW_LAYERS = [
+  { width: 11, opacity: 0.12 },
+  { width: 6, opacity: 0.22 },
+  { width: 2.2, opacity: 1 },
 ]
 
 // ── Interactive Nodes ──
@@ -291,15 +301,20 @@ function BodyExplorer({ onOpenForm }) {
   )
 }
 
+// Two-frame wing flap driven by CSS (see .hon-wing-* styles), no React re-renders
+function BirdSprite({ size }) {
+  const half = size / 2
+  return (
+    <>
+      <image className="hon-wing-open" href={BIRD_OPEN} x={-half} y={-half} width={size} height={size} />
+      <image className="hon-wing-closed" href={BIRD_CLOSED} x={-half} y={-half} width={size} height={size} />
+    </>
+  )
+}
+
 function HeaderBird() {
-  const [wingsOpen, setWingsOpen] = useState(true)
   const [direction, setDirection] = useState(1)
   const [pos, setPos] = useState({ x: -100, y: 15, opacity: 0, duration: 0 })
-
-  useEffect(() => {
-    const interval = setInterval(() => setWingsOpen((prev) => !prev), 120)
-    return () => clearInterval(interval)
-  }, [])
 
   useEffect(() => {
     let cancelled = false
@@ -346,24 +361,17 @@ function HeaderBird() {
       }}
       aria-hidden="true" /* Decorative animation */
     >
-      <g transform={`scale(${direction}, 1)`}>
-        <image href={wingsOpen ? BIRD_OPEN : BIRD_CLOSED} x="-25" y="-25" width="50" height="50" />
+      <g transform={`scale(${direction}, 1)`} className="hon-flapping">
+        <BirdSprite size={50} />
       </g>
     </g>
   )
 }
 
 function HoleBird() {
-  const [wingsOpen, setWingsOpen] = useState(false)
   const [isFlying, setIsFlying] = useState(false)
   const [direction, setDirection] = useState(1)
   const [pos, setPos] = useState({ x: -100, y: 500, opacity: 0, duration: 0 })
-
-  useEffect(() => {
-    if (!isFlying) { setWingsOpen(false); return }
-    const interval = setInterval(() => setWingsOpen((prev) => !prev), 120)
-    return () => clearInterval(interval)
-  }, [isFlying])
 
   useEffect(() => {
     let cancelled = false
@@ -413,12 +421,52 @@ function HoleBird() {
       }}
       aria-hidden="true" /* Decorative animation */
     >
-      <g transform={`scale(${direction}, 1)`}>
-        <image href={wingsOpen ? BIRD_OPEN : BIRD_CLOSED} x="-20" y="-20" width="40" height="40" />
+      <g transform={`scale(${direction}, 1)`} className={isFlying ? "hon-flapping" : "hon-perched"}>
+        <BirdSprite size={40} />
       </g>
     </g>
   )
 }
+
+// Memoized so hovering acorns or opening panels doesn't re-render the scene
+const Birds = memo(function Birds() {
+  return <g id="animated-birds" aria-hidden="true"><HeaderBird /><HoleBird /></g>
+})
+
+const BreathTraces = memo(function BreathTraces() {
+  return (
+    <g mask="url(#hide-lines-under-nodes)">
+      <g transform={TRACE_TRANSFORM}>
+        <g id="animated-breath-traces">
+          {SMOOTH_TRACES.map((path, i) => (
+            <g key={i} transform={`translate(${path.dx || 0}, ${path.dy || 0})`}>
+              <g
+                className="hon-trace"
+                style={{
+                  animationDuration: `${path.duration}s, ${path.duration}s`,
+                  animationDelay: `${path.delay}s, ${path.delay}s`,
+                }}
+              >
+                {GLOW_LAYERS.map((layer, li) => (
+                  <path
+                    key={li}
+                    d={path.smooth}
+                    pathLength={1}
+                    fill="none"
+                    stroke="url(#ethereal-flow)"
+                    strokeWidth={layer.width}
+                    strokeOpacity={layer.opacity}
+                    strokeLinecap="round"
+                  />
+                ))}
+              </g>
+            </g>
+          ))}
+        </g>
+      </g>
+    </g>
+  )
+})
 
 function AcornNode({ size, active }) {
   const col = active ? "#2a6040" : C
@@ -444,23 +492,34 @@ export default function App() {
 
   const activeNode = NODES.find((n) => n.id === activeId) ?? null
 
-  const [blobs, setBlobs] = useState({ guide: null })
   const [activeGifSrc, setActiveGifSrc] = useState(null)
 
-  useEffect(() => {
-    fetch(EMILY_GIF).then(r => r.blob()).then(b => setBlobs(p => ({ ...p, guide: b })))
-  }, [])
+  // Emily's GIF is downloaded only once someone heads toward The Guide (hover or tap),
+  // then cached so it restarts from frame one every time the panel opens.
+  const gifRef = useRef({ blob: null, pending: null })
+  const loadEmilyGif = () => {
+    const cache = gifRef.current
+    if (cache.blob) return Promise.resolve(cache.blob)
+    if (!cache.pending) {
+      cache.pending = fetch(EMILY_GIF)
+        .then((r) => r.blob())
+        .then((b) => (cache.blob = b))
+        .catch(() => { cache.pending = null; return null })
+    }
+    return cache.pending
+  }
 
   useEffect(() => {
-    let url = null;
-    if (activeId === "guide") {
-      url = blobs.guide ? URL.createObjectURL(blobs.guide) : `${EMILY_GIF}?t=${Date.now()}`
+    if (activeId !== "guide") { setActiveGifSrc(null); return }
+    let url = null
+    let cancelled = false
+    loadEmilyGif().then((blob) => {
+      if (cancelled) return
+      url = blob ? URL.createObjectURL(blob) : EMILY_GIF
       setActiveGifSrc(url)
-    } else {
-      setActiveGifSrc(null)
-    }
-    return () => { if (url && url.startsWith("blob:")) URL.revokeObjectURL(url) }
-  }, [activeId, blobs])
+    })
+    return () => { cancelled = true; if (url && url.startsWith("blob:")) URL.revokeObjectURL(url) }
+  }, [activeId])
 
   const checkScroll = () => {
     if (scrollRef.current) {
@@ -523,8 +582,11 @@ export default function App() {
     }
   }
 
+  const panelOpen = Boolean(activeNode || showBookingMenu)
+
   return (
-    <main className="relative w-full h-[100dvh] overflow-hidden overscroll-none bg-[#EAE5D4]">
+    <MotionConfig reducedMotion="user">
+    <main className={`relative w-full h-[100dvh] overflow-hidden overscroll-none bg-[#EAE5D4]${panelOpen ? " scene-paused" : ""}`}>
 
       {/* ── SEO: React 19 / Next.js Static Document Hoisted Metadata & Tags ── */}
       <title>The Heart of Noticing | Somatic Breathwork in Lancaster, PA</title>
@@ -622,6 +684,51 @@ export default function App() {
           position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px;
           overflow: hidden; clip: rect(0, 0, 0, 0); whiteSpace: nowrap; border: 0;
         }
+
+        /* ── Ambient motion runs in CSS so the browser can handle it without React ── */
+        .hon-halo {
+          background: radial-gradient(circle at 50% 40%, rgba(184,124,50,0.25) 0%, rgba(184,124,50,0) 75%);
+          transform-origin: 50% 40%;
+          animation: hon-halo 11s ease-in-out infinite;
+          will-change: opacity, transform;
+        }
+        @keyframes hon-halo {
+          0%, 100% { opacity: 0.16; transform: scale(0.82); }
+          50% { opacity: 0.4; transform: scale(1); }
+        }
+
+        .hon-breathe { animation: hon-breathe 10s ease-in-out infinite; }
+        @keyframes hon-breathe { 0%, 100% { opacity: 0.92; } 50% { opacity: 1; } }
+
+        .hon-trace {
+          stroke-dasharray: 0.12 1;
+          stroke-dashoffset: 0.12;
+          opacity: 0;
+          animation-name: hon-trace-move, hon-trace-fade;
+          animation-timing-function: ease-in-out, ease-in-out;
+          animation-iteration-count: infinite, infinite;
+          animation-fill-mode: backwards, backwards;
+        }
+        @keyframes hon-trace-move { from { stroke-dashoffset: 0.12; } to { stroke-dashoffset: -1; } }
+        @keyframes hon-trace-fade { 0% { opacity: 0; } 33.33% { opacity: 0.8; } 66.67% { opacity: 0.8; } 100% { opacity: 0; } }
+
+        .hon-flapping .hon-wing-open { animation: hon-flap 0.24s step-end infinite; }
+        .hon-flapping .hon-wing-closed { animation: hon-flap 0.24s step-end -0.12s infinite; }
+        .hon-perched .hon-wing-open { display: none; }
+        @keyframes hon-flap { 0% { opacity: 1; } 50% { opacity: 0; } 100% { opacity: 0; } }
+
+        /* Freeze the scene behind an open panel so the backdrop blur isn't recomputed every frame */
+        .scene-paused .hon-halo, .scene-paused .hon-breathe, .scene-paused .hon-trace,
+        .scene-paused .hon-wing-open, .scene-paused .hon-wing-closed { animation-play-state: paused; }
+
+        /* Panels sit on an already-blurred backdrop, so their own blur is skipped */
+        .glass-modal { backdrop-filter: none; -webkit-backdrop-filter: none; }
+
+        @media (prefers-reduced-motion: reduce) {
+          .hon-halo, .hon-breathe, .hon-trace, .hon-wing-open, .hon-wing-closed { animation: none !important; }
+          .hon-halo { opacity: 0.3; }
+          .hon-flapping .hon-wing-closed { opacity: 0; }
+        }
       `,
         }}
       />
@@ -649,18 +756,7 @@ export default function App() {
       </div>
 
       {/* ── Ambient Breathing Halo ── */}
-      <motion.div
-        className="absolute inset-0 pointer-events-none opacity-40 mix-blend-multiply"
-        animate={{
-          background: [
-            `radial-gradient(circle at 50% 40%, rgba(201,138,60,0.1) 0%, rgba(234,229,212,0) 60%)`,
-            `radial-gradient(circle at 50% 40%, rgba(201,138,60,0.25) 0%, rgba(234,229,212,0) 75%)`,
-            `radial-gradient(circle at 50% 40%, rgba(201,138,60,0.1) 0%, rgba(234,229,212,0) 60%)`
-          ]
-        }}
-        transition={{ duration: 11, repeat: Infinity, ease: "easeInOut" }}
-        aria-hidden="true"
-      />
+      <div className="absolute inset-0 pointer-events-none hon-halo" aria-hidden="true" />
 
       {/* ── Main Fluid SVG Container ── */}
       <div className="absolute inset-0 w-full h-full flex items-center justify-center overflow-hidden pt-12 md:pt-0">
@@ -678,17 +774,16 @@ export default function App() {
               <stop offset="70%" stopColor="#C77DFF" stopOpacity="0.75" />
               <stop offset="100%" stopColor="#7B2CBF" stopOpacity="0.55" />
             </linearGradient>
-            <filter id="ethereal-glow" x="-80%" y="-80%" width="260%" height="260%">
-              <feGaussianBlur stdDeviation="3.5" result="blur1" />
-              <feGaussianBlur stdDeviation="1.5" result="blur2" />
-              <feMerge><feMergeNode in="blur1" /><feMergeNode in="blur2" /><feMergeNode in="SourceGraphic" /></feMerge>
-            </filter>
-            <filter id="mask-blur" x="-50%" y="-50%" width="200%" height="200%"><feGaussianBlur stdDeviation="24" /></filter>
+            {/* Soft-edged holes around the acorns, drawn with a gradient instead of a blur filter */}
+            <radialGradient id="node-fade">
+              <stop offset="0%" stopColor="#000" stopOpacity="1" />
+              <stop offset="40%" stopColor="#000" stopOpacity="1" />
+              <stop offset="70%" stopColor="#000" stopOpacity="0.45" />
+              <stop offset="100%" stopColor="#000" stopOpacity="0" />
+            </radialGradient>
             <mask id="hide-lines-under-nodes">
               <rect x="0" y="0" width="800" height="1100" fill="white" />
-              <g filter="url(#mask-blur)">
-                {NODES.map((node) => <ellipse key={`mask-${node.id}`} cx={node.x} cy={node.y + 20} rx={110} ry={120} fill="black" />)}
-              </g>
+              {NODES.map((node) => <ellipse key={`mask-${node.id}`} cx={node.x} cy={node.y + 20} rx={158} ry={168} fill="url(#node-fade)" />)}
             </mask>
             <clipPath id="header-reveal">
               <motion.rect x="0" y="0" width="800" height="300" initial={{ width: 0 }} animate={{ width: 800 }} transition={{ duration: 2.8, ease: slowBioEase, delay: 0.2 }} />
@@ -708,34 +803,15 @@ export default function App() {
           {/* Header Typography (Visual text, semantic text is hidden in sr-only div for SEO) */}
           <motion.g id="header" clipPath="url(#header-reveal)" initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 1.5, ease: bioEase }} aria-hidden="true">
             <text x="400" y="43" textAnchor="middle" fontFamily="'Cormorant Garamond', serif" fontStyle="italic" fontSize="29" fill={C}>the</text>
-            <motion.text x="400" y="120" textAnchor="middle" fontFamily="'Dancing Script', cursive" fontSize="102" fontWeight="600" fill={C} animate={{ opacity: [0.92, 1, 0.92] }} transition={{ duration: 10, repeat: Infinity, ease: "easeInOut" }}>Heart of Noticing</motion.text>
+            <text className="hon-breathe" x="400" y="120" textAnchor="middle" fontFamily="'Dancing Script', cursive" fontSize="102" fontWeight="600" fill={C}>Heart of Noticing</text>
             <text x="400" y="167" textAnchor="middle" fontFamily="'Montserrat', sans-serif" fontSize="16" letterSpacing="0.25em" fontWeight="500" fill={C} opacity={0.9}>SOMATIC BREATHWORK • LANCASTER COUNTY, PA</text>
           </motion.g>
 
           {/* Ethereal Traces */}
-          <g mask="url(#hide-lines-under-nodes)">
-            <g transform={TRACE_TRANSFORM}>
-              <g id="animated-breath-traces">
-                {TRACED_PATHS.map((path, i) => (
-                  <g key={i} transform={`translate(${path.dx || 0}, ${path.dy || 0})`}>
-                    <motion.path
-                      d={smoothPath(path.d)}
-                      fill="none"
-                      stroke="url(#ethereal-flow)"
-                      strokeWidth="2.2" strokeLinecap="round"
-                      filter="url(#ethereal-glow)"
-                      initial={{ pathLength: 0.12, pathOffset: -0.12, opacity: 0 }}
-                      animate={{ pathOffset: 1, opacity: [0, 0.8, 0.8, 0] }}
-                      transition={{ duration: path.duration, ease: "easeInOut", repeat: Infinity, delay: path.delay }}
-                    />
-                  </g>
-                ))}
-              </g>
-            </g>
-          </g>
+          <BreathTraces />
 
           {/* Birds */}
-          <g id="animated-birds" aria-hidden="true"><HeaderBird /><HoleBird /></g>
+          <Birds />
 
           {/* Interactive Acorn Nodes */}
           <motion.g id="interactive-nodes" initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 2.5, delay: 0.8, ease: slowBioEase }}>
@@ -745,7 +821,8 @@ export default function App() {
                 <g key={node.id} transform={`translate(${node.x},${node.y})`}>
                   <motion.g
                     onClick={(e) => { e.stopPropagation(); handleNodeInteraction(node.id); }}
-                    onMouseEnter={() => setHoverId(node.id)}
+                    onMouseEnter={() => { setHoverId(node.id); if (node.id === "guide") loadEmilyGif() }}
+                    onPointerDown={() => { if (node.id === "guide") loadEmilyGif() }}
                     onMouseLeave={() => setHoverId(null)}
                     whileTap={{ scale: 0.9, transition: squishSpring }}
                     whileHover={{ scale: 1.05, transition: squishSpring }}
@@ -798,11 +875,11 @@ export default function App() {
       <AnimatePresence>
         {showBookingMenu && (
           <motion.div
-            initial={{ x: "-50%", y: "-40%", scale: 0.95, opacity: 0, filter: "blur(8px)" }}
-            animate={{ x: "-50%", y: "-50%", scale: 1, opacity: 1, filter: "blur(0px)" }}
-            exit={{ x: "-50%", y: "-45%", scale: 0.95, opacity: 0, filter: "blur(4px)" }}
+            initial={{ x: "-50%", y: "-40%", scale: 0.95, opacity: 0 }}
+            animate={{ x: "-50%", y: "-50%", scale: 1, opacity: 1 }}
+            exit={{ x: "-50%", y: "-45%", scale: 0.95, opacity: 0 }}
             transition={{ duration: 0.5, ease: slowBioEase }}
-            className="fixed z-50 flex flex-col top-1/2 left-1/2 w-[92%] max-w-[500px] max-h-[85vh] glass-panel rounded-[32px] overflow-hidden"
+            className="fixed z-50 flex flex-col top-1/2 left-1/2 w-[92%] max-w-[500px] max-h-[85vh] glass-panel glass-modal rounded-[32px] overflow-hidden"
             role="dialog"
             aria-modal="true"
             aria-labelledby="booking-title"
@@ -968,11 +1045,11 @@ export default function App() {
         {activeNode && (
           <motion.div
             key="panel"
-            initial={{ opacity: 0, scale: 0.95, x: "-50%", y: "-40%", filter: "blur(12px)" }}
-            animate={{ opacity: 1, scale: 1, x: "-50%", y: "-50%", filter: "blur(0px)" }}
-            exit={{ opacity: 0, scale: 0.97, x: "-50%", y: "-45%", filter: "blur(8px)" }}
+            initial={{ opacity: 0, scale: 0.95, x: "-50%", y: "-40%" }}
+            animate={{ opacity: 1, scale: 1, x: "-50%", y: "-50%" }}
+            exit={{ opacity: 0, scale: 0.97, x: "-50%", y: "-45%" }}
             transition={{ duration: 0.6, ease: slowBioEase }}
-            className="fixed z-50 overflow-hidden flex flex-col glass-panel"
+            className="fixed z-50 overflow-hidden flex flex-col glass-panel glass-modal"
             style={{
               top: "50%", left: "50%",
               width: "92%", maxWidth: "1080px",
@@ -1118,5 +1195,6 @@ export default function App() {
         </p>
       </motion.div>
     </main>
+    </MotionConfig>
   )
 }
