@@ -14,7 +14,7 @@ export const site = {
   announce: { label: "Next nature group", labelShort: "Next group", detail: "[Date]", href: "/nature-groups", cta: "Reserve your spot", ctaShort: "Reserve", ctaHref: "/connect?interest=nature-groups" },
   // All artwork ships with the site, in public/images/
   images: {
-    tree: "/images/tree.webp",
+    tree: "/images/tree-v2.webp",
     birdOpen: "/images/bird-open.webp",
     birdClosed: "/images/bird-closed.webp",
     emily: "/images/emily.mp4",

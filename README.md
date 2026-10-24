@@ -46,6 +46,8 @@ Clean URLs (`/nature-groups`, `/meet-emily`, and so on) work on Cloudflare autom
 
 ## Artwork
 
-All artwork ships with the site in `public/images/`: the tree (`tree.webp`), the two bird sprites, Emily's animation (`emily.mp4`, with `emily.webm` as a fallback and `emily-still.webp` as its still), the drawing of Emily leading a session (`emily-session.webp`), the photo of Emily on the home page (`emily-photo.webp`), the forest-floor photo behind the closing panel on the home page, and the stream textures. To swap a piece, replace the file and keep its name.
+All artwork ships with the site in `public/images/`: the tree (`tree-v2.webp`), the two bird sprites, Emily's animation (`emily.mp4`, with `emily.webm` as a fallback and `emily-still.webp` as its still), the drawing of Emily leading a session (`emily-session.webp`), the photo of Emily on the home page (`emily-photo.webp`), the forest-floor photo behind the closing panel on the home page, and the stream textures. To swap a piece, replace the file and keep its name.
+
+**Replacing an image that has already been published:** give it a new name and point the config at the new name. Cloudflare caches `/images/*` for a day, so a file replaced under the same name keeps serving the old copy from the edge for up to 24 hours. A new filename is a new cache key, so the change appears straight away.
 
 The fonts also ship with the site, in `public/fonts/`: Fraunces (upright and italic), Jost and Dancing Script, trimmed to Latin and to the weights in use. Their open font licences sit alongside them. The site no longer loads anything from Google Fonts.
