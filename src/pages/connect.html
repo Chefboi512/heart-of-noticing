@@ -1,0 +1,80 @@
+<!-- Connect is a task page: the form sits right under the title, with the direct line beside it (below it on phones) -->
+<section class="connect wrap" aria-labelledby="page-title">
+  <div class="connect__intro">
+    <p class="eyebrow">Take a breath</p>
+    <h1 id="page-title" class="display page-hero__title">Connect</h1>
+    <p class="lead">Tell me a bit about what brings you here.</p>
+  </div>
+
+  <div class="contact__card">
+    <form class="contact-form" action="{{ site.formAction }}" method="POST" data-basin-form data-phone="{{ site.phone.display }}" novalidate>
+      <fieldset class="chips">
+        <legend class="chips__legend">I’m interested in</legend>
+        <div class="chips__list">
+          <label class="chip"><input type="radio" name="interest" value="General Inquiry" data-key="general" data-cta="Send message" data-prompt="Anything you’d like Emily to know? A sentence or two is plenty." checked><span>Not sure yet</span></label>
+          <label class="chip"><input type="radio" name="interest" value="1-on-1 Sessions" data-key="one-on-one" data-cta="Request a discovery call" data-prompt="What’s been on your mind, or in your body, lately? Share only what feels comfortable."><span>1-on-1 Sessions</span></label>
+          <label class="chip"><input type="radio" name="interest" value="Nature Groups" data-key="nature-groups" data-cta="Reserve my spot" data-prompt="Which group date works for you, and how many people are coming?"><span>Nature Groups</span></label>
+          <label class="chip"><input type="radio" name="interest" value="Schools &amp; Facilities" data-key="schools" data-cta="Request a consult" data-prompt="Tell me about your school or organization, and roughly how many people."><span>Schools &amp; Facilities</span></label>
+        </div>
+      </fieldset>
+
+      <div class="field-row">
+        <div class="field">
+          <label for="first_name">First name</label>
+          <input id="first_name" name="first_name" type="text" autocomplete="given-name" required data-error-missing="Please add your first name." aria-describedby="first_name-error">
+          <p class="field__error" id="first_name-error" hidden></p>
+        </div>
+        <div class="field">
+          <label for="last_name">Last name</label>
+          <input id="last_name" name="last_name" type="text" autocomplete="family-name" required data-error-missing="Please add your last name." aria-describedby="last_name-error">
+          <p class="field__error" id="last_name-error" hidden></p>
+        </div>
+      </div>
+      <div class="field">
+        <label for="email">Email</label>
+        <input id="email" name="email" type="email" autocomplete="email" inputmode="email" required data-error-missing="Please add your email so Emily can reply." data-error-invalid="That email looks incomplete. Check for a missing @ or dot." aria-describedby="email-error">
+        <p class="field__error" id="email-error" hidden></p>
+      </div>
+      <div class="field">
+        <label for="message">Message <span class="field__optional">optional</span></label>
+        <textarea id="message" name="message" rows="4" placeholder="Anything you’d like Emily to know? A sentence or two is plenty." data-prompt-target></textarea>
+      </div>
+      <p class="form-error" role="alert" data-form-error hidden></p>
+      <button class="btn btn--block" type="submit" data-cta-target><span class="btn__label">Send message</span></button>
+      <p class="form-note">No pressure. A reply first, then a conversation if it feels right.</p>
+    </form>
+
+    <div class="form-success" data-form-success tabindex="-1" hidden>
+      <span class="form-success__icon" aria-hidden="true">
+        <svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><circle class="check__ring" cx="12" cy="12" r="10" pathLength="1"/><path class="check__mark" d="M8 12.5l2.5 2.5L16 9.5" pathLength="1"/></svg>
+      </span>
+      <p class="display form-success__title">Thank you<span data-success-name></span>.</p>
+      <p class="prose">Your message is with Emily. Take a deep breath, you’ve taken the first step.</p>
+      <ol class="next-steps" aria-label="What happens next">
+        <li><span class="next-steps__n" aria-hidden="true">1</span><span>Emily reads your message herself.</span></li>
+        <li><span class="next-steps__n" aria-hidden="true">2</span><span>She replies by email <span class="slot">[within a day or two]</span>.</span></li>
+        <li><span class="next-steps__n" aria-hidden="true">3</span><span>Together you find a time that suits you.</span></li>
+      </ol>
+    </div>
+  </div>
+
+  <div class="connect__direct">
+    <div class="arch-wrap arch-wrap--small">
+      <div class="arch arch--dusk" aria-hidden="true">
+        <span class="arch__star" style="--x:18%; --y:30%; --d:0s"></span>
+        <span class="arch__star" style="--x:34%; --y:16%; --d:1.4s"></span>
+        <span class="arch__star" style="--x:76%; --y:40%; --d:0.7s"></span>
+        <span class="arch__star" style="--x:26%; --y:48%; --d:2.2s"></span>
+        <span class="arch__star" style="--x:52%; --y:26%; --d:3s"></span>
+        <span class="arch__moon"></span>
+        <span class="arch__ridge arch__ridge--back"></span>
+        <span class="arch__ridge"></span>
+      </div>
+    </div>
+    <div class="connect__line">
+      <p class="eyebrow">Or reach out directly</p>
+      <a class="contact__phone" href="tel:{{ site.phone.tel }}">{{ site.phone.display }}</a>
+      <p class="aside__note">Somatic breathwork in {{ site.area }}.</p>
+    </div>
+  </div>
+</section>

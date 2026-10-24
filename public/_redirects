@@ -1,6 +1,9 @@
-# Cloudflare Pages — SPA fallback
-# Any unknown path serves index.html so client-side routing works.
-# This project is a single-page app with state-based navigation, so 200 fallback is safe.
-# 200 = serve /index.html directly (recommended for SPAs)
-# 404 = redirect to /404.html (alternative)
-/*    /index.html   200
+# Friendly short links. Every real page is its own file, so no catch-all is needed;
+# unknown paths get 404.html.
+/about     /meet-emily  301
+/emily     /meet-emily  301
+/contact   /connect     301
+/book      /connect     301
+/sessions  /one-on-one  301
+/nature    /nature-groups  301
+/circle    /the-circle  301

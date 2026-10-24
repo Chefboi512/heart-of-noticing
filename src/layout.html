@@ -1,0 +1,40 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>{{ page.title }}</title>
+<meta name="description" content="{{ page.description }}">
+<link rel="canonical" href="{{ page.url }}">
+<meta name="theme-color" content="{{ page.themeColor }}">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="{{ site.name }}">
+<meta property="og:title" content="{{ page.title }}">
+<meta property="og:description" content="{{ page.description }}">
+<meta property="og:url" content="{{ page.url }}">
+<meta property="og:image" content="{{ site.origin }}/og-image.jpg">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta name="twitter:card" content="summary_large_image">
+<link rel="icon" href="/favicon.svg" type="image/svg+xml">
+<link rel="preload" href="/fonts/fraunces.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="/fonts/jost.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="/fonts/dancing-script.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="stylesheet" href="{{ asset.css }}">
+<script src="{{ asset.js }}" defer></script>
+{{ raw.headExtra }}
+<!-- Fetch a page as soon as someone shows intent to open it, so it opens instantly -->
+<script type="speculationrules">{"prefetch":[{"where":{"href_matches":"/*"},"eagerness":"moderate"}]}</script>
+</head>
+<body{{ raw.bodyAttr }}>
+<a class="skip-link" href="#main">Skip to content</a>
+<div class="site">
+{{ raw.announce }}
+{{> header }}
+<main id="main">
+{{ raw.content }}
+</main>
+{{> footer }}
+</div>
+</body>
+</html>

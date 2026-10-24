@@ -1,101 +1,51 @@
 # The Heart of Noticing
 
-A somatic breathwork website for Lancaster County, PA. Interactive tree visualization with acorn navigation nodes, animated breathing paths, and a glassmorphism editorial modal system.
+Somatic breathwork website for Emily, Lancaster County, PA.
+Plain HTML, CSS and JavaScript, with no framework and nothing to install. Node 18 or newer builds it.
 
-## Tech Stack
-
-- **React 18** + **TypeScript**
-- **Vite 6** (build tool, HMR)
-- **Tailwind CSS 3** (utility-first styling)
-- **Framer Motion** (animations, gestures, layout transitions)
-- **Lucide React** (icons)
-
-## Getting Started
-
-```bash
-# Install dependencies
-pnpm install
-
-# Start dev server
-pnpm dev
-
-# Production build
-pnpm build
-
-# Preview production build
-pnpm preview
-```
-
-The dev server runs on `http://localhost:5173` by default.
-
-## Project Structure
+## Build and preview
 
 ```
-src/
-├── App.tsx          # Main component: tree scene, acorn nodes, modals, body explorer
-├── main.tsx         # React entry point
-├── index.css        # Global Tailwind directives
-└── components/      # Reusable UI primitives
+npm run build         # writes the finished site to dist/ (same as: node build.mjs)
+npm run dev           # builds, then serves it at http://localhost:8788
 ```
 
-The application is a single-page interactive experience:
-- An animated SVG tree background with traced breath paths
-- 5 interactive acorn nodes (The Guide, Notice the Body, Notice the Earth, Notice the Room, Stay Close)
-- An interactive "body explorer" with brain/heart/gut/feet segments
-- Glassmorphism modals with smooth blur transitions
-- Haptic feedback on supported mobile devices (`navigator.vibrate`)
+There are no dependencies, so there is nothing to `npm install`. `dist/` is generated and is not committed.
 
-## Asset Hosting
+## Deploy on Cloudflare Pages
 
-All images and GIFs are hosted on Cloudflare R2:
-- Tree artwork, bird sprites, acorn icon
-- Emily portrait (animated GIF)
-- Stencil artwork (animated GIF)
+- Build command: `npm run build` (or `node build.mjs`)
+- Build output directory: `dist`
+- Node version: 18 or newer (Cloudflare's default is fine)
 
-## Notes
+Clean URLs (`/nature-groups`, `/meet-emily`, and so on) work on Cloudflare automatically.
+`public/_redirects` holds short links (for example `/book` goes to `/connect`), and `public/_headers` sets caching.
 
-- The "use client" directive at the top of `App.tsx` is harmless in a Vite SPA (it's a no-op string outside Next.js).
-- Designed mobile-first; optimized for touch interactions.
+## Where things live
 
-## Deploying to Cloudflare Pages
+| To change | Edit |
+|---|---|
+| Phone, form address, the announcement strip, page titles and descriptions, the menu | `src/site.config.mjs` |
+| The words on a page | `src/pages/<page>.html` |
+| Header, footer, the service cards on the home page, the Circle sign-up form | `src/partials/` |
+| Colours, type, layout | `src/assets/site.css` |
+| Menu, header, button pop and haptics, birds, body journey, glowing service cards, home chapter guide, line reveals, forms | `src/assets/site.js` |
+| The moving stream on Nature Groups | `src/assets/stream.js` and `public/images/stream/` |
+| The animated tree, the body figure and the rising-breath picture | `src/scene.mjs` |
 
-This project is pre-configured for Cloudflare Pages:
+**Announcement strip.** In `site.config.mjs`, change `announce.detail` from `"[Date]"` to the real date, or set `announce: null` to hide the strip.
 
-- **`public/_redirects`** — SPA fallback so any unknown path serves `index.html` (state-based navigation works on refresh).
-- **`public/_headers`** — Cache & security headers:
-  - `Cache-Control: public, max-age=31536000, immutable` for `/assets/*` (hashed Vite bundles)
-  - `Cache-Control: public, max-age=0, must-revalidate` for `/*` (always-fresh HTML)
-  - `X-Content-Type-Options: nosniff`, `X-Frame-Options: SAMEORIGIN`, `Referrer-Policy: strict-origin-when-cross-origin`, `Permissions-Policy: camera=(), microphone=(), geolocation=()`
+**Placeholders.** Anything still in `[brackets]` is content Emily needs to supply, such as session length, prices, dates, meeting places and FAQ answers. These show on the page as marked slots until they're filled in. To find them all, search `src/pages/` for `[`.
 
-### Quick deploy
+**Background colour flow.** Each page drifts through its own soft colours as you scroll. Set it per page with `flow:` in `site.config.mjs`; the choices are dawn, earth, body, room, circle and dusk. The colours themselves are the `.flow-*` rules in `site.css`.
 
-1. Push this repo to GitHub ✅ (already done)
-2. In Cloudflare dashboard → **Pages** → **Create a project** → **Connect to Git**
-3. Select the `Chefboi512/heart-of-noticing` repo
-4. Set the build settings:
+## Other files
 
-   | Field | Value |
-   |---|---|
-   | **Framework preset** | Vite |
-   | **Build command** | `pnpm build` |
-   | **Build output directory** | `dist` |
-   | **Root directory** | (leave blank) |
-   | **Node version** | 20 (or latest) |
+- `serve.mjs`: a tiny local server for `npm run dev`, with clean URLs like Cloudflare's.
+- `preview.mjs`: only makes the in-chat preview work. The live site doesn't need it.
 
-5. Click **Save and Deploy** — first build takes ~1–2 min
+## Artwork
 
-### CLI deploy (alternative)
+All artwork ships with the site in `public/images/`: the tree (`tree.webp`), the two bird sprites, Emily's animation (`emily.mp4`, with `emily.webm` as a fallback and `emily-still.webp` as its still), the drawing of Emily leading a session (`emily-session.webp`), the photo of Emily on the home page (`emily-photo.webp`), the forest-floor photo behind the closing panel on the home page, and the stream textures. To swap a piece, replace the file and keep its name.
 
-```bash
-npm install -g wrangler
-pnpm build
-wrangler pages deploy dist --project-name=heart-of-noticing
-```
-
-### Why the static asset path
-
-Vite outputs hashed JS/CSS to `/assets/[name]-[hash].js`. The `_headers` rule sets `max-age=31536000, immutable` for that path because the hash changes whenever the content changes, so the browser can safely cache them forever. The HTML files are always revalidated.
-
-## Author
-
-© 2026 Media Mack Designs. All Rights Reserved.
+The fonts also ship with the site, in `public/fonts/`: Fraunces (upright and italic), Jost and Dancing Script, trimmed to Latin and to the weights in use. Their open font licences sit alongside them. The site no longer loads anything from Google Fonts.
